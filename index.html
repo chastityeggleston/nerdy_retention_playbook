@@ -1,0 +1,2160 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Retention Playbook</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap">
+
+<style>
+/* ── Design tokens ────────────────────────────────────────────
+   Layout: fixed left nav on desktop, bottom tab bar on mobile
+   Color: deep navy base, electric indigo accent, warm white type
+   Type: Syne (display/headings) + Inter (body/UI)
+──────────────────────────────────────────────────────────── */
+:root {
+  --bg:        #0a0d1a;
+  --surface:   #111527;
+  --surface2:  #181d35;
+  --border:    rgba(255,255,255,.08);
+  --accent:    #5b7fff;
+  --accent2:   #8b5cf6;
+  --success:   #22c55e;
+  --warn:      #f59e0b;
+  --danger:    #ef4444;
+  --fg:        #eef0f8;
+  --fg2:       #9ba3c7;
+  --fg3:       #5b6289;
+  --card-r:    12px;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg:      #f3f5ff;
+    --surface: #ffffff;
+    --surface2:#e8ecff;
+    --border:  rgba(0,0,0,.08);
+    --fg:      #0d1033;
+    --fg2:     #4a5180;
+    --fg3:     #8891b8;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg:      #f3f5ff;
+  --surface: #ffffff;
+  --surface2:#e8ecff;
+  --border:  rgba(0,0,0,.08);
+  --fg:      #0d1033;
+  --fg2:     #4a5180;
+  --fg3:     #8891b8;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  background: var(--bg);
+  color: var(--fg);
+  display: flex;
+  flex-direction: column;
+  padding-left: max(0px, env(safe-area-inset-left, 0px));
+  padding-right: max(0px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+}
+
+/* ── Shell ── */
+.shell {
+  display: flex;
+  height: 100%;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 0 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+.logo {
+  padding: 0 20px 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.logo-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.logo-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--fg);
+}
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  padding: 12px 20px 6px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 20px;
+  cursor: pointer;
+  border-radius: 0;
+  transition: background .15s, color .15s;
+  color: var(--fg2);
+  font-size: 13.5px;
+  font-weight: 500;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.nav-item:hover { background: var(--surface2); color: var(--fg); }
+.nav-item.active {
+  background: rgba(91,127,255,.12);
+  color: var(--accent);
+  border-right: 2px solid var(--accent);
+}
+.nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--fg3);
+}
+.built-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(91,127,255,.1);
+  border: 1px solid rgba(91,127,255,.2);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ── Main ── */
+.main {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 32px max(24px, env(safe-area-inset-right, 0px)) 48px max(24px, env(safe-area-inset-left, 0px));
+}
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── Page header ── */
+.page-header { margin-bottom: 28px; }
+.page-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.page-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--fg);
+  text-wrap: balance;
+}
+.page-sub {
+  margin-top: 6px;
+  color: var(--fg2);
+  max-width: 560px;
+}
+
+/* ── Stats row ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--card-r);
+  padding: 16px 18px;
+}
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  margin-bottom: 6px;
+}
+.stat-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.stat-delta {
+  font-size: 12px;
+  color: var(--success);
+  margin-top: 4px;
+}
+.stat-delta.down { color: var(--danger); }
+.stat-delta.neutral { color: var(--fg3); }
+
+/* ── Cards ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--card-r);
+  padding: 20px 22px;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 4px;
+}
+.card-sub { font-size: 12.5px; color: var(--fg2); }
+
+/* ── Lifecycle funnel ── */
+.funnel-wrap {
+  display: grid;
+  gap: 0;
+  margin-bottom: 8px;
+}
+.funnel-stage {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 0;
+  position: relative;
+}
+.funnel-stage + .funnel-stage::before {
+  content: '';
+  position: absolute;
+  left: 89px;
+  top: -1px;
+  width: 2px;
+  height: 2px;
+  background: var(--border);
+}
+.funnel-bar-col {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  position: relative;
+}
+.funnel-bar-col::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 20px;
+  height: 1px;
+  background: var(--border);
+}
+.funnel-bar {
+  height: 44px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 10px;
+  cursor: pointer;
+  transition: filter .15s, transform .1s;
+  min-width: 90px;
+  position: relative;
+}
+.funnel-bar:hover { filter: brightness(1.15); transform: scale(1.01); }
+.funnel-label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #fff;
+  white-space: nowrap;
+}
+.funnel-pct {
+  font-size: 12px;
+  opacity: .75;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.funnel-detail-col {
+  padding: 10px 0 10px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.funnel-detail-title { font-size: 13px; font-weight: 600; color: var(--fg); }
+.funnel-detail-text { font-size: 12px; color: var(--fg2); margin-top: 2px; }
+.funnel-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.chip {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2px 9px;
+  font-size: 11px;
+  color: var(--fg2);
+}
+.chip.accent { background: rgba(91,127,255,.12); border-color: rgba(91,127,255,.3); color: var(--accent); }
+
+/* ── Campaign cards ── */
+.campaign-grid { display: grid; gap: 16px; }
+.campaign-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--card-r);
+  overflow: hidden;
+}
+.campaign-header {
+  padding: 14px 18px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.campaign-stage-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.campaign-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14.5px;
+  color: var(--fg);
+}
+.campaign-trigger { font-size: 12px; color: var(--fg2); margin-top: 2px; }
+.campaign-body { padding: 14px 18px; }
+.email-preview {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+.email-meta { font-size: 11px; color: var(--fg3); margin-bottom: 8px; }
+.email-subject { font-weight: 600; font-size: 13.5px; color: var(--fg); margin-bottom: 8px; }
+.email-body-preview { font-size: 12.5px; color: var(--fg2); line-height: 1.6; }
+.campaign-metrics {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.cm-item { }
+.cm-label { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--fg3); }
+.cm-val { font-size: 14px; font-weight: 700; color: var(--fg); font-variant-numeric: tabular-nums; }
+
+/* ── Segments ── */
+.seg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.seg-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--card-r);
+  padding: 18px;
+  cursor: pointer;
+  transition: border-color .15s, transform .1s;
+}
+.seg-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.seg-card.selected { border-color: var(--accent); background: rgba(91,127,255,.06); }
+.seg-icon { font-size: 28px; margin-bottom: 10px; }
+.seg-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--fg); margin-bottom: 4px; }
+.seg-size { font-size: 12px; color: var(--fg3); margin-bottom: 8px; }
+.seg-desc { font-size: 13px; color: var(--fg2); line-height: 1.5; margin-bottom: 10px; }
+.seg-signals { }
+.seg-signals-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--fg3); margin-bottom: 5px; }
+.signal-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--fg2); margin-bottom: 3px; }
+.signal-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+/* ── Experiments ── */
+.exp-grid { display: grid; gap: 14px; }
+.exp-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--card-r);
+  padding: 18px 20px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  align-items: start;
+}
+.exp-number {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--fg3);
+  width: 28px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.exp-name { font-weight: 600; font-size: 13.5px; color: var(--fg); margin-bottom: 4px; }
+.exp-hypo { font-size: 12.5px; color: var(--fg2); line-height: 1.5; }
+.exp-variants { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+.variant-pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--fg2);
+}
+.variant-pill.control { border-color: rgba(91,127,255,.3); color: var(--accent); }
+.exp-meta-col { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+.impact-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.impact-high { background: rgba(34,197,94,.12); color: var(--success); }
+.impact-med { background: rgba(245,158,11,.12); color: var(--warn); }
+.effort-tag { font-size: 11px; color: var(--fg3); }
+
+/* ── Divider ── */
+.section-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 24px 0;
+}
+
+/* ── Bottom tabs (mobile) ── */
+.bottom-tabs {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  z-index: 50;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.bottom-tab-inner {
+  display: flex;
+  justify-content: space-around;
+}
+.btab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 4px 8px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--fg3);
+  font-size: 10px;
+  font-weight: 500;
+  transition: color .15s;
+}
+.btab.active { color: var(--accent); }
+.btab-icon { font-size: 20px; }
+
+@media (max-width: 680px) {
+  .sidebar { display: none; }
+  .bottom-tabs { display: block; }
+  .main { padding-bottom: 80px; }
+  .funnel-stage { grid-template-columns: 120px 1fr; }
+  .exp-card { grid-template-columns: 1fr; }
+  .exp-number { display: none; }
+  .exp-meta-col { flex-direction: row; align-items: center; }
+}
+
+/* ── Inline bar chart ── */
+.bar-track {
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.bar-fill { height: 100%; border-radius: 3px; transition: width .4s ease; }
+
+/* ── Timeline dots ── */
+.timeline { padding-left: 18px; border-left: 2px solid var(--border); }
+.tl-item { position: relative; padding-bottom: 18px; padding-left: 16px; }
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: -8px;
+  top: 5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+}
+.tl-item:last-child { padding-bottom: 0; }
+.tl-day { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.tl-title { font-size: 13.5px; font-weight: 600; color: var(--fg); margin: 2px 0; }
+.tl-desc { font-size: 12.5px; color: var(--fg2); }
+</style>
+
+<div class="shell">
+
+  <!-- ── Sidebar ── -->
+  <nav class="sidebar">
+    <div class="logo">
+      <div class="logo-eyebrow">Nerdy · Retention</div>
+      <div class="logo-name">Playbook OS</div>
+    </div>
+
+    <div class="nav-section-label">Strategy</div>
+    <button class="nav-item active" data-view="lifecycle" onclick="navigate('lifecycle',this)">
+      <span class="nav-icon">⬡</span> Lifecycle Map
+    </button>
+    <button class="nav-item" data-view="segments" onclick="navigate('segments',this)">
+      <span class="nav-icon">◎</span> Segments
+    </button>
+    <button class="nav-item" data-view="personas" onclick="navigate('personas',this)">
+      <span class="nav-icon">◉</span> Personas
+    </button>
+
+    <div class="nav-section-label">Execution</div>
+    <button class="nav-item" data-view="campaigns" onclick="navigate('campaigns',this)">
+      <span class="nav-icon">✉</span> Campaigns
+    </button>
+    <button class="nav-item" data-view="experiments" onclick="navigate('experiments',this)">
+      <span class="nav-icon">⚗</span> Experiments
+    </button>
+
+    <div class="nav-section-label">Reporting</div>
+    <button class="nav-item" data-view="metrics" onclick="navigate('metrics',this)">
+      <span class="nav-icon">▤</span> KPI Dashboard
+    </button>
+
+    <div class="sidebar-footer">
+      <div class="built-badge">⚡ Built with Claude Code</div>
+    </div>
+  </nav>
+
+  <!-- ── Main content ── -->
+  <main class="main">
+
+    <!-- ════ LIFECYCLE VIEW ════ -->
+    <div id="view-lifecycle" class="view active">
+      <div class="page-header">
+        <div class="page-eyebrow">Strategy Layer</div>
+        <h1 class="page-title">Consumer Retention Lifecycle</h1>
+        <p class="page-sub">A full-funnel view of Nerdy's customer journey — from first login to long-term renewal and reactivation. Each stage maps to owned channels and measurable outcomes.</p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Target Renewal Rate</div>
+          <div class="stat-value">92%</div>
+          <div class="stat-delta">↑ vs. ~78% industry avg</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Activation Window</div>
+          <div class="stat-value">Day 7</div>
+          <div class="stat-delta neutral">Critical drop-off gate</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Winback Window</div>
+          <div class="stat-value">30–60d</div>
+          <div class="stat-delta neutral">Best conversion timing</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">LTV Driver</div>
+          <div class="stat-value">Sessions</div>
+          <div class="stat-delta">Session freq → renewal</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Customer Journey Funnel</div>
+        <div class="card-sub" style="margin-bottom:20px">Click any stage to explore signals and tactics</div>
+
+        <div class="funnel-wrap" id="funnel">
+
+          <div class="funnel-stage">
+            <div class="funnel-bar-col">
+              <div class="funnel-bar" style="background: linear-gradient(135deg,#5b7fff,#818cf8); width:170px" onclick="selectStage('activation')">
+                <span class="funnel-label">Activation</span>
+                <span class="funnel-pct">100%</span>
+              </div>
+            </div>
+            <div class="funnel-detail-col" id="detail-activation">
+              <div class="funnel-detail-title">Days 0–7: First session success</div>
+              <div class="funnel-detail-text">Parent books first tutoring session; student attends and rates it. This is the make-or-break moment for the entire subscription.</div>
+              <div class="funnel-chips">
+                <span class="chip accent">Onboarding email D1</span>
+                <span class="chip accent">Session reminder SMS</span>
+                <span class="chip">Match quality survey</span>
+                <span class="chip">In-app welcome flow</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="funnel-stage">
+            <div class="funnel-bar-col">
+              <div class="funnel-bar" style="background: linear-gradient(135deg,#4f6fe8,#7c3aed); width:148px" onclick="selectStage('engagement')">
+                <span class="funnel-label">Engagement</span>
+                <span class="funnel-pct">78%</span>
+              </div>
+            </div>
+            <div class="funnel-detail-col" id="detail-engagement">
+              <div class="funnel-detail-title">Days 8–60: Build the habit loop</div>
+              <div class="funnel-detail-text">Regular session cadence, progress milestones, feature discovery. Low engagement at 30d is the #1 churn predictor.</div>
+              <div class="funnel-chips">
+                <span class="chip accent">Progress digest email</span>
+                <span class="chip accent">Usage nudge at D14</span>
+                <span class="chip">Goal check-in push</span>
+                <span class="chip">Tutor relationship email</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="funnel-stage">
+            <div class="funnel-bar-col">
+              <div class="funnel-bar" style="background: linear-gradient(135deg,#7c3aed,#a855f7); width:126px" onclick="selectStage('at-risk')">
+                <span class="funnel-label">At-Risk</span>
+                <span class="funnel-pct">61%</span>
+              </div>
+            </div>
+            <div class="funnel-detail-col" id="detail-at-risk">
+              <div class="funnel-detail-title">Signal: ↓ session freq or no login 10+ days</div>
+              <div class="funnel-detail-text">Triggered intervention window. These customers are reachable — they haven't cancelled yet. Speed and personalization win here.</div>
+              <div class="funnel-chips">
+                <span class="chip accent">Personalized save sequence</span>
+                <span class="chip accent">Pause offer</span>
+                <span class="chip">CS outreach trigger</span>
+                <span class="chip">Outcome reminder</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="funnel-stage">
+            <div class="funnel-bar-col">
+              <div class="funnel-bar" style="background: linear-gradient(135deg,#0ea5e9,#5b7fff); width:110px" onclick="selectStage('renewal')">
+                <span class="funnel-label">Renewal</span>
+                <span class="funnel-pct">54%</span>
+              </div>
+            </div>
+            <div class="funnel-detail-col" id="detail-renewal">
+              <div class="funnel-detail-title">Days 50–90: Lock in next cycle</div>
+              <div class="funnel-detail-text">ROI-focused messaging tied to student outcomes. Progress report + upcoming season anchor make the renewal case concrete.</div>
+              <div class="funnel-chips">
+                <span class="chip accent">Progress report email</span>
+                <span class="chip accent">Early renewal offer D60</span>
+                <span class="chip">Back-to-school sequence</span>
+                <span class="chip">Upgrade upsell</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="funnel-stage">
+            <div class="funnel-bar-col">
+              <div class="funnel-bar" style="background: linear-gradient(135deg,#ef4444,#f97316); width:82px" onclick="selectStage('winback')">
+                <span class="funnel-label">Winback</span>
+                <span class="funnel-pct">23%</span>
+              </div>
+            </div>
+            <div class="funnel-detail-col" id="detail-winback">
+              <div class="funnel-detail-title">Post-cancel: Days 1–90 re-entry</div>
+              <div class="funnel-detail-text">Cancelled customers have already seen value — they just need the right timing and incentive. New school year is the highest-converting re-entry moment.</div>
+              <div class="funnel-chips">
+                <span class="chip accent">3-touch winback sequence</span>
+                <span class="chip accent">Seasonal re-entry offer</span>
+                <span class="chip">New feature announcement</span>
+                <span class="chip">Social proof email</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px">Key Churn Signals to Track</div>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-day">Day 3</div>
+              <div class="tl-title">No session booked post-signup</div>
+              <div class="tl-desc">Trigger immediate email + SMS to book first session</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-day">Day 14</div>
+              <div class="tl-title">Session frequency &lt; 1/week</div>
+              <div class="tl-desc">Send habit-building tips; surface scheduler</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-day">Day 30</div>
+              <div class="tl-title">No login in 10 days</div>
+              <div class="tl-desc">High-risk flag; escalate to save sequence</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-day">Day 60</div>
+              <div class="tl-title">Pre-renewal window opens</div>
+              <div class="tl-desc">Progress report + renewal email series begins</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px">Channel Mix by Stage</div>
+          <div style="display:flex; flex-direction:column; gap:12px">
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:3px">
+                <span style="font-size:12.5px; color:var(--fg2)">Email (lifecycle)</span>
+                <span style="font-size:12.5px; font-weight:600; color:var(--fg)">Primary</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill" style="width:90%; background:var(--accent)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:3px">
+                <span style="font-size:12.5px; color:var(--fg2)">SMS (triggers)</span>
+                <span style="font-size:12.5px; font-weight:600; color:var(--fg)">High urgency</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill" style="width:72%; background:var(--accent2)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:3px">
+                <span style="font-size:12.5px; color:var(--fg2)">Push notifications</span>
+                <span style="font-size:12.5px; font-weight:600; color:var(--fg)">Session reminders</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill" style="width:65%; background:#22c55e"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:3px">
+                <span style="font-size:12.5px; color:var(--fg2)">In-app / web</span>
+                <span style="font-size:12.5px; font-weight:600; color:var(--fg)">Onboarding</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill" style="width:55%; background:#f59e0b"></div></div>
+            </div>
+            <div>
+              <div style="display:flex; justify-content:space-between; margin-bottom:3px">
+                <span style="font-size:12.5px; color:var(--fg2)">Paid retargeting</span>
+                <span style="font-size:12.5px; font-weight:600; color:var(--fg)">Winback only</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill" style="width:30%; background:#ef4444"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ SEGMENTS VIEW ════ -->
+    <div id="view-segments" class="view">
+      <div class="page-header">
+        <div class="page-eyebrow">Audience Layer</div>
+        <h1 class="page-title">Customer Segments</h1>
+        <p class="page-sub">Five behavioral segments that drive differentiated messaging — defined by usage patterns, session frequency, and subscription health signals, not demographics alone.</p>
+      </div>
+
+      <div class="seg-grid">
+        <div class="seg-card" onclick="this.classList.toggle('selected')">
+          <div class="seg-icon">🚀</div>
+          <div class="seg-name">Power Learners</div>
+          <div class="seg-size">~18% of base · Highest LTV</div>
+          <div class="seg-desc">3+ sessions/week, high tutor ratings, consistent login. These customers carry the renewal base and are ready for upsell and referral asks.</div>
+          <div class="seg-signals">
+            <div class="seg-signals-label">Behavioral Signals</div>
+            <div class="signal-row"><span class="signal-dot" style="background:#22c55e"></span>Sessions ≥ 3/week</div>
+            <div class="signal-row"><span class="signal-dot" style="background:#22c55e"></span>Rating avg 4.7+</div>
+            <div class="signal-row"><span class="signal-dot" style="background:#22c55e"></span>30-day login streak</div>
+          </div>
+          <div class="funnel-chips" style="margin-top:10px">
+            <span class="chip accent">Referral ask</span>
+            <span class="chip accent">Upsell upgrade</span>
+            <span class="chip">Loyalty milestone</span>
+          </div>
+        </div>
+
+        <div class="seg-card" onclick="this.classList.toggle('selected')">
+          <div class="seg-icon">📅</div>
+          <div class="seg-name">Consistent Engagers</div>
+          <div class="seg-size">~31% of base · Core retention target</div>
+          <div class="seg-desc">1–2 sessions/week, stable usage. Reliable subscribers who renew if reminded of progress and kept connected to their goals.</div>
+          <div class="seg-signals">
+            <div class="seg-signals-label">Behavioral Signals</div>
+            <div class="signal-row"><span class="signal-dot" style="background:#5b7fff"></span>1–2 sessions/week</div>
+            <div class="signal-row"><span class="signal-dot" style="background:#5b7fff"></span>Weekly app logins</div>
+            <div class="signal-row"><span class="signal-dot" style="background:#5b7fff"></span>Opens progress emails</div>
+          </div>
+          <div class="funnel-chips" style="margin-top:10px">
+            <span class="chip accent">Progress digest</span>
+            <span class="chip accent">Goal check-in</span>
+            <span class="chip">Early renewal nudge</span>
+          </div>
+        </div>
+
+        <div class="seg-card" onclick="this.classList.toggle('selected')">
+          <div class="seg-icon">⚠️</div>
+          <div class="seg-name">Drifters</div>
+          <div class="seg-size">~24% of base · Highest save opportunity</div>
+          <div class="seg-desc">Were active; now sporadic. 1 session in past 3 weeks, skipped check-ins. Usually distracted, not dissatisfied — re-engagement is high-ROI here.</div>
+          <div class="seg-signals">
+            <div class="seg-signals-label">Behavioral Signals</div>
+            <div class="signal-row"><span class="signal-dot" style="background:#f59e0b"></span>Session gap 10–21 days</div>
+            <div class="signal-row"><span class="signal-dot" style="background:#f59e0b"></span>Login frequency ↓ 50%</div>
+            <div class="signal-row"><span class="signal-dot" style="background:#f59e0b"></span>Last email unopened</div>
+          </div>
+          <div class="funnel-chips" style="margin-top:10px">
+            <span class="chip accent">Re-engagement sequence</span>
+            <span class="chip accent">Tutor message trigger</span>
+            <span class="chip">Pause offer</span>
+          </div>
+        </div>
+
+        <div class="seg-card" onclick="this.classList.toggle('selected')">
+          <div class="seg-icon">🆕</div>
+          <div class="seg-name">New Activators</div>
+          <div class="seg-size">~15% of base · Highest churn risk</div>
+          <div class="seg-desc">Signed up within 30 days. Haven't yet built a session habit. Every touchpoint here shapes their perception of the entire platform.</div>
+          <div class="seg-signals">
+            <div class="seg-signals-label">Behavioral Signals</div>
+            <div class="signal-row"><span class="signal-dot" style="background:#8b5cf6"></span>Signup &lt; 30 days ago</div>
+            <div class="signal-row"><span class="signal-dot" style="background:#8b5cf6"></span>Completed onboarding?</div>
+            <div class="signal-row"><span class="signal-dot" style="background:#8b5cf6"></span>First session rated?</div>
+          </div>
+          <div class="funnel-chips" style="margin-top:10px">
+            <span class="chip accent">First session series</span>
+            <span class="chip accent">Day 7 check-in</span>
+            <span class="chip">Match refinement offer</span>
+          </div>
+        </div>
+
+        <div class="seg-card" onclick="this.classList.toggle('selected')">
+          <div class="seg-icon">💤</div>
+          <div class="seg-name">Lapsed / Cancelled</div>
+          <div class="seg-size">~12% of churned base · Winback pool</div>
+          <div class="seg-desc">Cancelled within 90 days. They know the product — they just need the right moment and a compelling offer to return. School-year timing drives the highest re-entry rate.</div>
+          <div class="seg-signals">
+            <div class="seg-signals-label">Behavioral Signals</div>
+            <div class="signal-row"><span class="signal-dot" style="background:#ef4444"></span>Cancelled 1–90 days ago</div>
+            <div class="signal-row"><span class="signal-dot" style="background:#ef4444"></span>Had ≥1 session (not ghost)</div>
+            <div class="signal-row"><span class="signal-dot" style="background:#ef4444"></span>Cancel reason: pause/cost</div>
+          </div>
+          <div class="funnel-chips" style="margin-top:10px">
+            <span class="chip accent">3-touch winback</span>
+            <span class="chip accent">Seasonal re-entry</span>
+            <span class="chip">New feature proof point</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ PERSONAS VIEW ════ -->
+    <div id="view-personas" class="view">
+      <div class="page-header">
+        <div class="page-eyebrow">Audience Layer</div>
+        <h1 class="page-title">Customer Personas</h1>
+        <p class="page-sub">Parent archetypes for the consumer subscription and district stakeholder archetypes for the institutional side — two distinct buyer journeys, different retention levers entirely.</p>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap">
+        <button class="persona-toggle active" id="toggle-consumer" onclick="switchPersonas('consumer')">
+          Consumer (Parents)
+        </button>
+        <button class="persona-toggle" id="toggle-district" onclick="switchPersonas('district')">
+          District (B2B)
+        </button>
+      </div>
+      <style>
+        .persona-toggle {
+          padding: 8px 18px;
+          border-radius: 8px;
+          border: 1px solid var(--border);
+          background: var(--surface);
+          color: var(--fg2);
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all .15s;
+        }
+        .persona-toggle.active {
+          background: var(--accent);
+          border-color: var(--accent);
+          color: #fff;
+        }
+        .persona-toggle:not(.active):hover {
+          border-color: var(--accent);
+          color: var(--fg);
+        }
+        .persona-panel { display: none; }
+        .persona-panel.active { display: block; }
+      </style>
+
+      <style>
+        .persona-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--card-r);
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+        }
+        .persona-header {
+          padding: 20px 22px 16px;
+          border-bottom: 1px solid var(--border);
+          display: flex;
+          align-items: flex-start;
+          gap: 14px;
+        }
+        .persona-avatar {
+          width: 52px;
+          height: 52px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 24px;
+          flex-shrink: 0;
+        }
+        .persona-name {
+          font-family: 'Syne', sans-serif;
+          font-size: 17px;
+          font-weight: 800;
+          color: var(--fg);
+          line-height: 1.2;
+        }
+        .persona-tagline {
+          font-size: 12.5px;
+          color: var(--fg2);
+          margin-top: 3px;
+          font-style: italic;
+        }
+        .persona-meta {
+          display: flex;
+          gap: 10px;
+          margin-top: 8px;
+          flex-wrap: wrap;
+        }
+        .persona-meta-item {
+          font-size: 11px;
+          color: var(--fg3);
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .persona-body {
+          padding: 18px 22px;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          flex: 1;
+        }
+        .persona-section-label {
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: .1em;
+          text-transform: uppercase;
+          color: var(--fg3);
+          margin-bottom: 6px;
+        }
+        .persona-quote {
+          background: var(--bg);
+          border-left: 3px solid var(--accent);
+          border-radius: 0 6px 6px 0;
+          padding: 10px 14px;
+          font-size: 13px;
+          color: var(--fg2);
+          font-style: italic;
+          line-height: 1.5;
+        }
+        .pain-list, .goal-list {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+        .pain-item, .goal-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 7px;
+          font-size: 12.5px;
+          color: var(--fg2);
+          line-height: 1.4;
+        }
+        .pain-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: var(--danger);
+          flex-shrink: 0;
+          margin-top: 5px;
+        }
+        .goal-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: var(--success);
+          flex-shrink: 0;
+          margin-top: 5px;
+        }
+        .persona-message-box {
+          background: var(--bg);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          padding: 12px 14px;
+        }
+        .persona-message-angle {
+          font-size: 12.5px;
+          color: var(--fg);
+          font-weight: 600;
+          margin-bottom: 4px;
+        }
+        .persona-message-detail {
+          font-size: 12px;
+          color: var(--fg2);
+          line-height: 1.5;
+        }
+        .risk-bar-wrap { margin-top: 2px; }
+        .risk-label-row {
+          display: flex;
+          justify-content: space-between;
+          font-size: 11px;
+          color: var(--fg3);
+          margin-bottom: 4px;
+        }
+        .risk-value { font-weight: 700; }
+      </style>
+
+      <div id="panel-consumer" class="persona-panel active">
+
+        <!-- Pricing tiers -->
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:22px">
+          <div style="background:rgba(91,127,255,.08); border:1px solid rgba(91,127,255,.2); border-radius:10px; padding:14px 16px; text-align:center">
+            <div style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); margin-bottom:6px">Starter</div>
+            <div style="font-size:22px; font-weight:800; color:var(--fg); line-height:1">$525</div>
+            <div style="font-size:12px; color:var(--fg2); margin-top:4px">9 hours · K–12</div>
+          </div>
+          <div style="background:rgba(91,127,255,.13); border:2px solid rgba(91,127,255,.4); border-radius:10px; padding:14px 16px; text-align:center; position:relative">
+            <div style="font-size:9px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:#fff; background:var(--accent); border-radius:20px; padding:2px 8px; display:inline-block; margin-bottom:6px">Most Popular</div>
+            <div style="font-size:22px; font-weight:800; color:var(--fg); line-height:1">$795</div>
+            <div style="font-size:12px; color:var(--fg2); margin-top:4px">15 hours · K–12</div>
+          </div>
+          <div style="background:rgba(139,92,246,.08); border:1px solid rgba(139,92,246,.25); border-radius:10px; padding:14px 16px; text-align:center">
+            <div style="font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--accent2); margin-bottom:6px">Best Value</div>
+            <div style="font-size:22px; font-weight:800; color:var(--fg); line-height:1">$1,495</div>
+            <div style="font-size:12px; color:var(--fg2); margin-top:4px">30 hours · K–12</div>
+          </div>
+        </div>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:16px">
+
+        <!-- Persona 1: The Outcome-Driven Parent -->
+        <div class="persona-card">
+          <div class="persona-header">
+            <div class="persona-avatar" style="background: rgba(91,127,255,.15);">🎯</div>
+            <div>
+              <div class="persona-name">The Outcome Driver</div>
+              <div class="persona-tagline">"I need to see the grade move."</div>
+              <div class="persona-meta">
+                <span class="persona-meta-item">👤 Parent, 38–50</span>
+                <span class="persona-meta-item">📍 Suburban, competitive district</span>
+                <span class="persona-meta-item">💰 HHI $120k+</span>
+                <span class="persona-meta-item" style="background:rgba(139,92,246,.12);color:var(--accent2);border-color:rgba(139,92,246,.25)">🏆 30-hr tier ($1,495)</span>
+              </div>
+            </div>
+          </div>
+          <div class="persona-body">
+            <div>
+              <div class="persona-section-label">In their words</div>
+              <div class="persona-quote">"I'm paying for results. If my kid's grade hasn't moved in 6 weeks, I'm out."</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+              <div>
+                <div class="persona-section-label">Goals</div>
+                <div class="goal-list">
+                  <div class="goal-item"><span class="goal-dot"></span>Grade improvement (A/B target)</div>
+                  <div class="goal-item"><span class="goal-dot"></span>SAT/ACT score gains</div>
+                  <div class="goal-item"><span class="goal-dot"></span>College readiness</div>
+                </div>
+              </div>
+              <div>
+                <div class="persona-section-label">Pain Points</div>
+                <div class="pain-list">
+                  <div class="pain-item"><span class="pain-dot"></span>Can't see what's happening in sessions</div>
+                  <div class="pain-item"><span class="pain-dot"></span>Progress feels invisible</div>
+                  <div class="pain-item"><span class="pain-dot"></span>Impatient with slow ramp-up</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="persona-section-label">Retention Message Angle</div>
+              <div class="persona-message-box">
+                <div class="persona-message-angle">Lead with data, always.</div>
+                <div class="persona-message-detail">Show specific grade deltas, test score improvements, and session counts. This persona renews on evidence. The progress report email is their most important touchpoint — make it quantified and undeniable.</div>
+              </div>
+            </div>
+            <div>
+              <div class="persona-section-label">Churn Risk</div>
+              <div class="risk-bar-wrap">
+                <div class="risk-label-row"><span>If no visible progress by day 30</span><span class="risk-value" style="color:var(--danger)">High</span></div>
+                <div class="bar-track"><div class="bar-fill" style="width:80%;background:var(--danger)"></div></div>
+              </div>
+            </div>
+            <div class="funnel-chips">
+              <span class="chip accent">Progress digest</span>
+              <span class="chip accent">Score milestone alert</span>
+              <span class="chip">Pre-renewal ROI email</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Persona 2: The Rescue Parent -->
+        <div class="persona-card">
+          <div class="persona-header">
+            <div class="persona-avatar" style="background: rgba(239,68,68,.12);">🆘</div>
+            <div>
+              <div class="persona-name">The Rescue Parent</div>
+              <div class="persona-tagline">"My kid is falling behind and I'm scared."</div>
+              <div class="persona-meta">
+                <span class="persona-meta-item">👤 Parent, 35–48</span>
+                <span class="persona-meta-item">📍 Any market</span>
+                <span class="persona-meta-item">💰 Mixed income levels</span>
+                <span class="persona-meta-item" style="background:rgba(91,127,255,.1);color:var(--accent)">🚀 Starts 9-hr ($525) → upsell 15-hr</span>
+              </div>
+            </div>
+          </div>
+          <div class="persona-body">
+            <div>
+              <div class="persona-section-label">In their words</div>
+              <div class="persona-quote">"His teacher said he might not pass. I don't know what else to do. I just need someone to help him."</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+              <div>
+                <div class="persona-section-label">Goals</div>
+                <div class="goal-list">
+                  <div class="goal-item"><span class="goal-dot"></span>Prevent failure / grade repetition</div>
+                  <div class="goal-item"><span class="goal-dot"></span>Restore child's confidence</div>
+                  <div class="goal-item"><span class="goal-dot"></span>Feel like they did everything possible</div>
+                </div>
+              </div>
+              <div>
+                <div class="persona-section-label">Pain Points</div>
+                <div class="pain-list">
+                  <div class="pain-item"><span class="pain-dot"></span>High anxiety — needs reassurance</div>
+                  <div class="pain-item"><span class="pain-dot"></span>Worried about tutor fit/trust</div>
+                  <div class="pain-item"><span class="pain-dot"></span>Unsure if it's "working"</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="persona-section-label">Retention Message Angle</div>
+              <div class="persona-message-box">
+                <div class="persona-message-angle">Reassurance + early wins.</div>
+                <div class="persona-message-detail">This persona needs to feel supported, not sold to. Early session feedback, tutor-sent notes, and small wins ("completed 3 sessions this week!") do more than any discount. They're emotionally invested — meet that energy with warmth.</div>
+              </div>
+            </div>
+            <div>
+              <div class="persona-section-label">Churn Risk</div>
+              <div class="risk-bar-wrap">
+                <div class="risk-label-row"><span>If tutor feels like a mismatch</span><span class="risk-value" style="color:var(--warn)">Medium-High</span></div>
+                <div class="bar-track"><div class="bar-fill" style="width:65%;background:var(--warn)"></div></div>
+              </div>
+            </div>
+            <div class="funnel-chips">
+              <span class="chip accent">Tutor check-in email</span>
+              <span class="chip accent">Early win celebration</span>
+              <span class="chip">Match refinement offer</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Persona 3: The Convenience Seeker -->
+        <div class="persona-card">
+          <div class="persona-header">
+            <div class="persona-avatar" style="background: rgba(245,158,11,.12);">⏱️</div>
+            <div>
+              <div class="persona-name">The Busy Optimizer</div>
+              <div class="persona-tagline">"This only works if it fits into our schedule."</div>
+              <div class="persona-meta">
+                <span class="persona-meta-item">👤 Working parent, 32–45</span>
+                <span class="persona-meta-item">📍 Urban / suburban</span>
+                <span class="persona-meta-item">💰 Dual income, time-poor</span>
+                <span class="persona-meta-item" style="background:rgba(91,127,255,.1);color:var(--accent)">⚡ 15-hr tier ($795) — sweet spot</span>
+              </div>
+            </div>
+          </div>
+          <div class="persona-body">
+            <div>
+              <div class="persona-section-label">In their words</div>
+              <div class="persona-quote">"I want to help, but between work and activities I just can't manage another thing to coordinate."</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+              <div>
+                <div class="persona-section-label">Goals</div>
+                <div class="goal-list">
+                  <div class="goal-item"><span class="goal-dot"></span>Minimal friction, maximum autopilot</div>
+                  <div class="goal-item"><span class="goal-dot"></span>Flexible scheduling around activities</div>
+                  <div class="goal-item"><span class="goal-dot"></span>Feels like a responsible parent</div>
+                </div>
+              </div>
+              <div>
+                <div class="persona-section-label">Pain Points</div>
+                <div class="pain-list">
+                  <div class="pain-item"><span class="pain-dot"></span>Scheduling friction kills engagement</div>
+                  <div class="pain-item"><span class="pain-dot"></span>Guilt when they cancel/miss sessions</div>
+                  <div class="pain-item"><span class="pain-dot"></span>Forgets subscription exists</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="persona-section-label">Retention Message Angle</div>
+              <div class="persona-message-box">
+                <div class="persona-message-angle">Remove every possible friction point.</div>
+                <div class="persona-message-detail">This persona lapses because life gets in the way, not because they're unhappy. The pause option is critical here — it's the difference between a 30-day pause and a permanent cancel. Scheduling nudges, reminders, and "one tap to book" CTAs serve this persona best.</div>
+              </div>
+            </div>
+            <div>
+              <div class="persona-section-label">Churn Risk</div>
+              <div class="risk-bar-wrap">
+                <div class="risk-label-row"><span>Seasonal drift (summer, holidays)</span><span class="risk-value" style="color:var(--warn)">Medium</span></div>
+                <div class="bar-track"><div class="bar-fill" style="width:55%;background:var(--warn)"></div></div>
+              </div>
+            </div>
+            <div class="funnel-chips">
+              <span class="chip accent">Scheduling nudge SMS</span>
+              <span class="chip accent">Pause offer (drift save)</span>
+              <span class="chip">Session reminder push</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Persona 4: The Value Validator -->
+        <div class="persona-card">
+          <div class="persona-header">
+            <div class="persona-avatar" style="background: rgba(34,197,94,.1);">💳</div>
+            <div>
+              <div class="persona-name">The Value Validator</div>
+              <div class="persona-tagline">"I need to justify this cost every month."</div>
+              <div class="persona-meta">
+                <span class="persona-meta-item">👤 Parent, 30–52</span>
+                <span class="persona-meta-item">📍 Any market</span>
+                <span class="persona-meta-item">💰 Budget-conscious, $60–90k HHI</span>
+                <span class="persona-meta-item" style="background:rgba(34,197,94,.08);color:var(--success);border-color:rgba(34,197,94,.2)">💡 9-hr ($525) — highest churn risk</span>
+              </div>
+            </div>
+          </div>
+          <div class="persona-body">
+            <div>
+              <div class="persona-section-label">In their words</div>
+              <div class="persona-quote">"It's a lot of money. I want to make sure we're actually using it and it's making a difference."</div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+              <div>
+                <div class="persona-section-label">Goals</div>
+                <div class="goal-list">
+                  <div class="goal-item"><span class="goal-dot"></span>Cost per session feels worth it</div>
+                  <div class="goal-item"><span class="goal-dot"></span>Visible usage (not wasted)</div>
+                  <div class="goal-item"><span class="goal-dot"></span>Annual plan saves money</div>
+                </div>
+              </div>
+              <div>
+                <div class="persona-section-label">Pain Points</div>
+                <div class="pain-list">
+                  <div class="pain-item"><span class="pain-dot"></span>Low session usage = cancel impulse</div>
+                  <div class="pain-item"><span class="pain-dot"></span>Sensitive to price increases</div>
+                  <div class="pain-item"><span class="pain-dot"></span>Comparison-shops alternatives</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="persona-section-label">Retention Message Angle</div>
+              <div class="persona-message-box">
+                <div class="persona-message-angle">Make the math obvious.</div>
+                <div class="persona-message-detail">Lead with per-session math: 9-hr plan = $58/hr, 15-hr = $53/hr, 30-hr = $50/hr — vs. in-person tutoring at $80–120/hr. The 30-hr plan is their best deal and your stickiest renewal. Frame the upgrade as: "You've used X of 9 hours — for $270 more you get 6 additional hours and lock in the lowest rate." Rational math, no emotional appeals.</div>
+              </div>
+            </div>
+            <div>
+              <div class="persona-section-label">Churn Risk</div>
+              <div class="risk-bar-wrap">
+                <div class="risk-label-row"><span>Low usage months + renewal date</span><span class="risk-value" style="color:var(--danger)">High</span></div>
+                <div class="bar-track"><div class="bar-fill" style="width:75%;background:var(--danger)"></div></div>
+              </div>
+            </div>
+            <div class="funnel-chips">
+              <span class="chip accent">Usage summary email</span>
+              <span class="chip accent">Annual plan upsell</span>
+              <span class="chip">Cost comparison landing page</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card" style="margin-top:8px">
+        <div class="card-title" style="margin-bottom:14px">Consumer Persona → Campaign Mapping</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border)">
+                <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Persona</th>
+                <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Top Channel</th>
+                <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Primary Hook</th>
+                <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Renewal Lever</th>
+                <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Save Offer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--border)">
+                <td style="padding:10px 12px;font-weight:600;color:var(--fg)">🎯 Outcome Driver</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Email</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Grade / score delta data</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Annual progress report</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Tutor match swap + free session</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border)">
+                <td style="padding:10px 12px;font-weight:600;color:var(--fg)">🆘 Rescue Parent</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Email + tutor message</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Reassurance + early win</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Confidence milestone</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Free tutor swap, no questions</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border)">
+                <td style="padding:10px 12px;font-weight:600;color:var(--fg)">⏱️ Busy Optimizer</td>
+                <td style="padding:10px 12px;color:var(--fg2)">SMS + push</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Scheduling ease</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Streak / habit hook</td>
+                <td style="padding:10px 12px;color:var(--fg2)">30-day free pause</td>
+              </tr>
+              <tr>
+                <td style="padding:10px 12px;font-weight:600;color:var(--fg)">💳 Value Validator</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Email</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Cost-per-session math</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Annual plan savings offer</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Usage boost + 1 free session</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      </div> <!-- end consumer panel -->
+
+      <!-- District panel -->
+      <div id="panel-district" class="persona-panel">
+
+        <!-- Product line reference -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin-bottom:18px">
+          <div style="background:rgba(91,127,255,.08); border:1px solid rgba(91,127,255,.2); border-radius:10px; padding:13px 15px">
+            <div style="font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:5px">Academic 1-on-1 Tutoring</div>
+            <div style="font-size:13px; font-weight:600; color:var(--fg); margin-bottom:3px">K–5 · 6–8 · 9–12</div>
+            <div style="font-size:12px; color:var(--fg2)">3,000+ subjects · Live Learning Platform · Contract pricing</div>
+          </div>
+          <div style="background:rgba(139,92,246,.08); border:1px solid rgba(139,92,246,.2); border-radius:10px; padding:13px 15px">
+            <div style="font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent2); margin-bottom:5px">Certified Reading Intervention</div>
+            <div style="font-size:13px; font-weight:600; color:var(--fg); margin-bottom:3px">1-on-1 · Small Group options</div>
+            <div style="font-size:12px; color:var(--fg2)">IEP/504 aligned · Title I + IDEA fundable</div>
+          </div>
+          <div style="background:rgba(34,197,94,.07); border:1px solid rgba(34,197,94,.18); border-radius:10px; padding:13px 15px">
+            <div style="font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--success); margin-bottom:5px">Special Education Classes</div>
+            <div style="font-size:13px; font-weight:600; color:var(--fg); margin-bottom:3px">K–12 Small Group · Custom contract pricing</div>
+            <div style="font-size:12px; color:var(--fg2)">IDEA Part B fundable · IEP/504 specialists</div>
+          </div>
+          <div style="background:rgba(245,158,11,.07); border:1px solid rgba(245,158,11,.18); border-radius:10px; padding:13px 15px">
+            <div style="font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--warn); margin-bottom:5px">Proof Points</div>
+            <div style="font-size:13px; font-weight:600; color:var(--fg); margin-bottom:3px">91% mastery rate · 4.9/5.0 rating</div>
+            <div style="font-size:12px; color:var(--fg2)">Use in impact reports + renewal proposals</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(91,127,255,.06); border:1px solid rgba(91,127,255,.2); border-radius:10px; padding:14px 18px; margin-bottom:20px; font-size:13px; color:var(--fg2); line-height:1.6">
+          <strong style="color:var(--fg)">District retention is fundamentally different.</strong> The buyer is not the user. Renewal is tied to budget cycles and board approval, not monthly habit. The Learning Differences line (Reading Intervention + Special Ed) is IDEA-fundable — a separate and stickier renewal motion than the general tutoring budget. Multi-stakeholder alignment across the Superintendent, Curriculum Director, Principal, and Grants Coordinator is the unlock.
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:16px">
+
+          <!-- District Persona 1 -->
+          <div class="persona-card">
+            <div class="persona-header">
+              <div class="persona-avatar" style="background:rgba(91,127,255,.15);">🏛️</div>
+              <div>
+                <div class="persona-name">The District Decision-Maker</div>
+                <div class="persona-tagline">"I need to justify this to my board."</div>
+                <div class="persona-meta">
+                  <span class="persona-meta-item">👤 Supt / Deputy Supt / CAO</span>
+                  <span class="persona-meta-item">📍 Any district size</span>
+                </div>
+              </div>
+            </div>
+            <div class="persona-body">
+              <div>
+                <div class="persona-section-label">In their words</div>
+                <div class="persona-quote">"If I can't show the school board measurable student outcomes by renewal time, this doesn't get funded again."</div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+                <div>
+                  <div class="persona-section-label">Goals</div>
+                  <div class="goal-list">
+                    <div class="goal-item"><span class="goal-dot"></span>Board-defensible ROI</div>
+                    <div class="goal-item"><span class="goal-dot"></span>Equity / access narrative</div>
+                    <div class="goal-item"><span class="goal-dot"></span>Benchmark data vs. peers</div>
+                  </div>
+                </div>
+                <div>
+                  <div class="persona-section-label">Pain Points</div>
+                  <div class="pain-list">
+                    <div class="pain-item"><span class="pain-dot"></span>Hard to aggregate usage data</div>
+                    <div class="pain-item"><span class="pain-dot"></span>Teacher adoption uneven</div>
+                    <div class="pain-item"><span class="pain-dot"></span>Budget pressures every cycle</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="persona-section-label">Retention Message Angle</div>
+                <div class="persona-message-box">
+                  <div class="persona-message-angle">Give them the board presentation.</div>
+                  <div class="persona-message-detail">A district impact report delivered 60 days before renewal — with student outcome data, usage by school, and peer benchmarks — does more than any outreach campaign. Make it easy for them to say yes to the board without doing extra work.</div>
+                </div>
+              </div>
+              <div>
+                <div class="persona-section-label">Renewal Risk</div>
+                <div class="risk-bar-wrap">
+                  <div class="risk-label-row"><span>If no impact report before budget season</span><span class="risk-value" style="color:var(--danger)">High</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width:82%; background:var(--danger)"></div></div>
+                </div>
+              </div>
+              <div class="funnel-chips">
+                <span class="chip accent">Annual impact report</span>
+                <span class="chip accent">Executive briefing</span>
+                <span class="chip">Peer district comparison</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- District Persona 2 -->
+          <div class="persona-card">
+            <div class="persona-header">
+              <div class="persona-avatar" style="background:rgba(139,92,246,.12);">📐</div>
+              <div>
+                <div class="persona-name">The Curriculum Champion</div>
+                <div class="persona-tagline">"Does this actually align with what we're teaching?"</div>
+                <div class="persona-meta">
+                  <span class="persona-meta-item">👤 Dir. of Curriculum / Instruction</span>
+                  <span class="persona-meta-item">📍 Mid-to-large districts</span>
+                </div>
+              </div>
+            </div>
+            <div class="persona-body">
+              <div>
+                <div class="persona-section-label">In their words</div>
+                <div class="persona-quote">"I need tutoring that reinforces what teachers are doing in the classroom, not a parallel curriculum that confuses students."</div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+                <div>
+                  <div class="persona-section-label">Goals</div>
+                  <div class="goal-list">
+                    <div class="goal-item"><span class="goal-dot"></span>Standards alignment</div>
+                    <div class="goal-item"><span class="goal-dot"></span>Teacher buy-in & ease of use</div>
+                    <div class="goal-item"><span class="goal-dot"></span>Measurable learning outcomes</div>
+                  </div>
+                </div>
+                <div>
+                  <div class="persona-section-label">Pain Points</div>
+                  <div class="pain-list">
+                    <div class="pain-item"><span class="pain-dot"></span>Teachers don't refer students</div>
+                    <div class="pain-item"><span class="pain-dot"></span>No visibility into session content</div>
+                    <div class="pain-item"><span class="pain-dot"></span>Adoption varies by school</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="persona-section-label">Retention Message Angle</div>
+                <div class="persona-message-box">
+                  <div class="persona-message-angle">Prove instructional alignment, reduce teacher friction.</div>
+                  <div class="persona-message-detail">Case studies showing how tutoring reinforced classroom instruction, paired with teacher-facing resources that make it easy to refer students. Mid-year adoption digest helps them see which schools are thriving and surfaces where to intervene.</div>
+                </div>
+              </div>
+              <div>
+                <div class="persona-section-label">Renewal Risk</div>
+                <div class="risk-bar-wrap">
+                  <div class="risk-label-row"><span>Low teacher referral rate by mid-year</span><span class="risk-value" style="color:var(--warn)">Medium</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width:58%; background:var(--warn)"></div></div>
+                </div>
+              </div>
+              <div class="funnel-chips">
+                <span class="chip accent">Mid-year adoption digest</span>
+                <span class="chip accent">Teacher referral toolkit</span>
+                <span class="chip">Outcome case study</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- District Persona 3 -->
+          <div class="persona-card">
+            <div class="persona-header">
+              <div class="persona-avatar" style="background:rgba(34,197,94,.1);">🏫</div>
+              <div>
+                <div class="persona-name">The Building Principal</div>
+                <div class="persona-tagline">"My teachers are already stretched. Make this easy."</div>
+                <div class="persona-meta">
+                  <span class="persona-meta-item">👤 Principal / Asst. Principal</span>
+                  <span class="persona-meta-item">📍 School level, all sizes</span>
+                </div>
+              </div>
+            </div>
+            <div class="persona-body">
+              <div>
+                <div class="persona-section-label">In their words</div>
+                <div class="persona-quote">"I support this, but I need it to be something my staff can actually use without adding to their plate."</div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+                <div>
+                  <div class="persona-section-label">Goals</div>
+                  <div class="goal-list">
+                    <div class="goal-item"><span class="goal-dot"></span>Student success visible to parents</div>
+                    <div class="goal-item"><span class="goal-dot"></span>Low lift for teachers</div>
+                    <div class="goal-item"><span class="goal-dot"></span>Equity for highest-need students</div>
+                  </div>
+                </div>
+                <div>
+                  <div class="persona-section-label">Pain Points</div>
+                  <div class="pain-list">
+                    <div class="pain-item"><span class="pain-dot"></span>Teacher time already maxed</div>
+                    <div class="pain-item"><span class="pain-dot"></span>Families don't know it's available</div>
+                    <div class="pain-item"><span class="pain-dot"></span>Hardest-to-reach families unused</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="persona-section-label">Retention Message Angle</div>
+                <div class="persona-message-box">
+                  <div class="persona-message-angle">Show school-level usage and surface the gaps.</div>
+                  <div class="persona-message-detail">A school usage snapshot mid-year ("42% of eligible students haven't signed up yet — here's a shareable parent flyer") gives principals an action they can take without a heavy lift. Activation of underserved families is both a retention story and an equity story.</div>
+                </div>
+              </div>
+              <div>
+                <div class="persona-section-label">Renewal Risk</div>
+                <div class="risk-bar-wrap">
+                  <div class="risk-label-row"><span>Low student activation at their school</span><span class="risk-value" style="color:var(--warn)">Medium</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width:50%; background:var(--warn)"></div></div>
+                </div>
+              </div>
+              <div class="funnel-chips">
+                <span class="chip accent">School activation snapshot</span>
+                <span class="chip accent">Parent outreach flyer</span>
+                <span class="chip">Back-to-school kickoff</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- District Persona 4 -->
+          <div class="persona-card">
+            <div class="persona-header">
+              <div class="persona-avatar" style="background:rgba(245,158,11,.1);">📋</div>
+              <div>
+                <div class="persona-name">The Grants Coordinator</div>
+                <div class="persona-tagline">"This needs to be compliant with how the funds are coded."</div>
+                <div class="persona-meta">
+                  <span class="persona-meta-item">👤 Grants / Federal Programs Dir.</span>
+                  <span class="persona-meta-item">📍 Title I and ESSER districts</span>
+                </div>
+              </div>
+            </div>
+            <div class="persona-body">
+              <div>
+                <div class="persona-section-label">In their words</div>
+                <div class="persona-quote">"ESSER is gone. I need to know if the reading intervention qualifies under IDEA Part B before I can code it in the budget — and I need that documentation now, not in April."</div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px">
+                <div>
+                  <div class="persona-section-label">Goals</div>
+                  <div class="goal-list">
+                    <div class="goal-item"><span class="goal-dot"></span>Fund compliance documentation</div>
+                    <div class="goal-item"><span class="goal-dot"></span>Audit-ready usage reporting</div>
+                    <div class="goal-item"><span class="goal-dot"></span>Budget cycle alignment</div>
+                  </div>
+                </div>
+                <div>
+                  <div class="persona-section-label">Pain Points</div>
+                  <div class="pain-list">
+                    <div class="pain-item"><span class="pain-dot"></span>ESSER cliff — funding dried up</div>
+                    <div class="pain-item"><span class="pain-dot"></span>Needs compliance documentation</div>
+                    <div class="pain-item"><span class="pain-dot"></span>Budget locked until April/May</div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="persona-section-label">Retention Message Angle</div>
+                <div class="persona-message-box">
+                  <div class="persona-message-angle">Be the easiest vendor to re-fund.</div>
+                  <div class="persona-message-detail">Proactive funding guidance (Title I, IDEA, state tutoring allocations), ready-made compliance documentation, and early outreach before April budget lock-in. Districts that can't find the budget line don't renew — even if they love the product.</div>
+                </div>
+              </div>
+              <div>
+                <div class="persona-section-label">Renewal Risk</div>
+                <div class="risk-bar-wrap">
+                  <div class="risk-label-row"><span>If funding path unclear by Feb/March</span><span class="risk-value" style="color:var(--danger)">High</span></div>
+                  <div class="bar-track"><div class="bar-fill" style="width:78%; background:var(--danger)"></div></div>
+                </div>
+              </div>
+              <div class="funnel-chips">
+                <span class="chip accent">Funding guide (Title I/IDEA)</span>
+                <span class="chip accent">Q1 renewal outreach</span>
+                <span class="chip">Compliance report template</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="card" style="margin-top:8px">
+          <div class="card-title" style="margin-bottom:14px">District Renewal Calendar</div>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-day">August–Sept</div>
+              <div class="tl-title">Back-to-School Activation</div>
+              <div class="tl-desc">Launch student activation campaign with principals; distribute parent-facing materials; set usage baseline for the year</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-day">November</div>
+              <div class="tl-title">Mid-Year Adoption Review</div>
+              <div class="tl-desc">Send school-level usage snapshots to curriculum directors and principals; identify low-adoption schools for intervention</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-day">January–Feb</div>
+              <div class="tl-title">Funding & Budget Outreach</div>
+              <div class="tl-desc">Proactive outreach to grants coordinators with funding guidance before district budget season locks in April/May</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-day">March–April</div>
+              <div class="tl-title">Annual Impact Report</div>
+              <div class="tl-desc">Deliver board-ready impact report to decision-makers: student outcomes, usage by school, peer benchmarks, ROI calculation</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-day">May–June</div>
+              <div class="tl-title">Renewal Negotiation Window</div>
+              <div class="tl-desc">Executive briefings, renewal proposals, upsell conversations (seats, schools, features); close before summer budget freeze</div>
+            </div>
+          </div>
+        </div>
+
+      </div> <!-- end district panel -->
+
+    </div>
+
+    <!-- ════ CAMPAIGNS VIEW ════ -->
+    <div id="view-campaigns" class="view">
+      <div class="page-header">
+        <div class="page-eyebrow">Execution Layer</div>
+        <h1 class="page-title">Campaign Library</h1>
+        <p class="page-sub">Five high-priority campaigns to build in Q1 — prioritized by impact on retention and lifetime value. Each includes a trigger logic and sample email copy.</p>
+      </div>
+
+      <div class="campaign-grid">
+
+        <!-- Campaign 1 -->
+        <div class="campaign-card">
+          <div class="campaign-header">
+            <div>
+              <span class="campaign-stage-badge" style="background:rgba(91,127,255,.15); color:var(--accent)">ACTIVATION</span>
+              <div class="campaign-name" style="margin-top:6px">First Session Success Sequence</div>
+              <div class="campaign-trigger">Trigger: User signs up → no session booked after 48 hours</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0">
+              <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:rgba(34,197,94,.12);color:var(--success)">High Priority</span>
+              <span style="font-size:11px;color:var(--fg3)">3-touch · D0, D2, D5</span>
+            </div>
+          </div>
+          <div class="campaign-body">
+            <div class="email-preview">
+              <div class="email-meta">Day 2 · Email · Subject line A (test B below)</div>
+              <div class="email-subject">Your first tutoring session is waiting, [First name]</div>
+              <div class="email-body-preview">
+                You signed up to help [Student] get ahead — and the right tutor is ready when you are.<br><br>
+                Most families who book their first session within the first week see meaningful progress by the end of month one. It only takes 15 minutes to get matched and scheduled.<br><br>
+                <strong>→ Book [Student]'s first session</strong><br><br>
+                If you have any questions about how it works, reply to this email — a real person will get back to you within the hour.
+              </div>
+            </div>
+            <div class="campaign-metrics">
+              <div class="cm-item"><div class="cm-label">Target Open Rate</div><div class="cm-val">38–42%</div></div>
+              <div class="cm-item"><div class="cm-label">Target CTR</div><div class="cm-val">14–18%</div></div>
+              <div class="cm-item"><div class="cm-label">Goal Metric</div><div class="cm-val">Session Booked</div></div>
+              <div class="cm-item"><div class="cm-label">Test Variable</div><div class="cm-val">Subject + CTA copy</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campaign 2 -->
+        <div class="campaign-card">
+          <div class="campaign-header">
+            <div>
+              <span class="campaign-stage-badge" style="background:rgba(139,92,246,.15); color:var(--accent2)">ENGAGEMENT</span>
+              <div class="campaign-name" style="margin-top:6px">Monthly Progress Digest</div>
+              <div class="campaign-trigger">Trigger: Monthly send · Personalized by student subject + session count</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0">
+              <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:rgba(34,197,94,.12);color:var(--success)">High Priority</span>
+              <span style="font-size:11px;color:var(--fg3)">Automated · Monthly</span>
+            </div>
+          </div>
+          <div class="campaign-body">
+            <div class="email-preview">
+              <div class="email-meta">Monthly cadence · Email · Dynamic content blocks</div>
+              <div class="email-subject">[Student]'s October: 6 sessions, 2 test scores improved 📈</div>
+              <div class="email-body-preview">
+                This month, [Student] completed 6 sessions with [Tutor] and showed measurable improvement in Algebra II and essay structure.<br><br>
+                <strong>Highlights this month:</strong> Sessions completed: 6 · Avg session rating: 4.8/5 · Topics covered: Quadratics, Thesis structure<br><br>
+                Coming up: [Student] has a session scheduled Thursday at 4pm. The next natural milestone is the November SAT prep cycle — would you like to add a dedicated prep block?<br><br>
+                <strong>→ See full progress report</strong>
+              </div>
+            </div>
+            <div class="campaign-metrics">
+              <div class="cm-item"><div class="cm-label">Target Open Rate</div><div class="cm-val">40–48%</div></div>
+              <div class="cm-item"><div class="cm-label">Target CTR</div><div class="cm-val">18–24%</div></div>
+              <div class="cm-item"><div class="cm-label">Goal Metric</div><div class="cm-val">Renewal rate</div></div>
+              <div class="cm-item"><div class="cm-label">Test Variable</div><div class="cm-val">Data density</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campaign 3 -->
+        <div class="campaign-card">
+          <div class="campaign-header">
+            <div>
+              <span class="campaign-stage-badge" style="background:rgba(245,158,11,.12); color:var(--warn)">AT-RISK</span>
+              <div class="campaign-name" style="margin-top:6px">Drift Save Sequence</div>
+              <div class="campaign-trigger">Trigger: No login 10+ days AND no session in 14 days (subscribed ≥30d)</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0">
+              <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:rgba(34,197,94,.12);color:var(--success)">Urgent</span>
+              <span style="font-size:11px;color:var(--fg3)">3-touch · Email + SMS</span>
+            </div>
+          </div>
+          <div class="campaign-body">
+            <div class="email-preview">
+              <div class="email-meta">Touch 1 · Email · Soft re-engagement</div>
+              <div class="email-subject">[Tutor] noticed [Student] hasn't been in recently</div>
+              <div class="email-body-preview">
+                Hi [Parent name],<br><br>
+                [Tutor] wanted us to pass along a note — [Student] hasn't had a session in a couple of weeks, and they're ready when you are.<br><br>
+                Life gets busy. That's completely normal. If scheduling has been the challenge, we can help you find a time that actually sticks.<br><br>
+                <strong>→ Schedule next session with [Tutor]</strong> · Or reply "PAUSE" and we'll hold your spot for 30 days, no charge.
+              </div>
+            </div>
+            <div class="campaign-metrics">
+              <div class="cm-item"><div class="cm-label">Target Save Rate</div><div class="cm-val">22–28%</div></div>
+              <div class="cm-item"><div class="cm-label">SMS CTR (T2)</div><div class="cm-val">9–12%</div></div>
+              <div class="cm-item"><div class="cm-label">Goal Metric</div><div class="cm-val">Session rebooked</div></div>
+              <div class="cm-item"><div class="cm-label">Test Variable</div><div class="cm-val">Tutor vs parent framing</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campaign 4 -->
+        <div class="campaign-card">
+          <div class="campaign-header">
+            <div>
+              <span class="campaign-stage-badge" style="background:rgba(14,165,233,.12); color:#38bdf8">RENEWAL</span>
+              <div class="campaign-name" style="margin-top:6px">Pre-Renewal ROI Campaign</div>
+              <div class="campaign-trigger">Trigger: 30 days before subscription renewal date</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0">
+              <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:rgba(34,197,94,.12);color:var(--success)">High Priority</span>
+              <span style="font-size:11px;color:var(--fg3)">4-touch · Email · D-30 to D-3</span>
+            </div>
+          </div>
+          <div class="campaign-body">
+            <div class="email-preview">
+              <div class="email-meta">Touch 1 of 4 · D-30 · ROI anchor</div>
+              <div class="email-subject">Here's what [Student] accomplished this year with Nerdy</div>
+              <div class="email-body-preview">
+                Before you renew (or not), we thought you should see the full picture.<br><br>
+                <strong>[Student]'s year in numbers:</strong><br>
+                ✓ 48 sessions completed<br>
+                ✓ Grade average improved 1.2 points in Math<br>
+                ✓ SAT score up 80 points since August<br>
+                ✓ 4.9/5 tutor satisfaction rating<br><br>
+                Your subscription renews on November 14. Continue with the same plan, or explore our Annual plan and save 20%.<br><br>
+                <strong>→ Renew and save</strong> · <strong>See all options</strong>
+              </div>
+            </div>
+            <div class="campaign-metrics">
+              <div class="cm-item"><div class="cm-label">Target Renewal Rate</div><div class="cm-val">88–92%</div></div>
+              <div class="cm-item"><div class="cm-label">Upsell Rate</div><div class="cm-val">12–18%</div></div>
+              <div class="cm-item"><div class="cm-label">Goal Metric</div><div class="cm-val">Subscription renewed</div></div>
+              <div class="cm-item"><div class="cm-label">Test Variable</div><div class="cm-val">Progress data vs. testimonial</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campaign 5 -->
+        <div class="campaign-card">
+          <div class="campaign-header">
+            <div>
+              <span class="campaign-stage-badge" style="background:rgba(239,68,68,.12); color:var(--danger)">WINBACK</span>
+              <div class="campaign-name" style="margin-top:6px">Back-to-School Re-Entry</div>
+              <div class="campaign-trigger">Trigger: Cancelled 1–90 days ago + August/January calendar trigger</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0">
+              <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:rgba(245,158,11,.12);color:var(--warn)">Seasonal</span>
+              <span style="font-size:11px;color:var(--fg3)">3-touch · 2× per year</span>
+            </div>
+          </div>
+          <div class="campaign-body">
+            <div class="email-preview">
+              <div class="email-meta">Touch 1 · Re-entry email · Urgency + incentive</div>
+              <div class="email-subject">New year, new tutor? [Student] can start this week.</div>
+              <div class="email-body-preview">
+                School's back. Grades matter again. And Nerdy's AI matching has gotten significantly better since you last used us — your tutor options are sharper, scheduling is faster, and the first session is now free when you restart.<br><br>
+                We know the timing wasn't right before. That's okay. Come back when it is — and if this week works, we'll waive your first month's fee and get [Student] matched today.<br><br>
+                <strong>→ Restart my subscription</strong><br><br>
+                <em>Offer valid through August 31. No credit card changes needed — we'll apply the credit to your account.</em>
+              </div>
+            </div>
+            <div class="campaign-metrics">
+              <div class="cm-item"><div class="cm-label">Target Win Rate</div><div class="cm-val">14–20%</div></div>
+              <div class="cm-item"><div class="cm-label">Target Open Rate</div><div class="cm-val">28–35%</div></div>
+              <div class="cm-item"><div class="cm-label">Goal Metric</div><div class="cm-val">Resubscribed</div></div>
+              <div class="cm-item"><div class="cm-label">Test Variable</div><div class="cm-val">Incentive type</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════ EXPERIMENTS VIEW ════ -->
+    <div id="view-experiments" class="view">
+      <div class="page-header">
+        <div class="page-eyebrow">Optimization Layer</div>
+        <h1 class="page-title">Experiment Backlog</h1>
+        <p class="page-sub">Prioritized A/B and multivariate tests ranked by expected lift vs. implementation effort. Each hypothesis is grounded in observed drop-off patterns.</p>
+      </div>
+
+      <div class="exp-grid">
+
+        <div class="exp-card">
+          <div class="exp-number">01</div>
+          <div>
+            <div class="exp-name">Tutor-Sent vs. Brand-Sent Drift Email</div>
+            <div class="exp-hypo">Hypothesis: Emails appearing to come from the student's tutor ("noticed you haven't been in") will outperform brand-sent emails on open rate and re-engagement click because the relationship feels personal, not transactional.</div>
+            <div class="exp-variants">
+              <span class="variant-pill control">A: From: Nerdy Team</span>
+              <span class="variant-pill">B: From: Sarah (your tutor)</span>
+            </div>
+          </div>
+          <div class="exp-meta-col">
+            <span class="impact-badge impact-high">High Impact</span>
+            <span class="effort-tag">Low effort</span>
+          </div>
+        </div>
+
+        <div class="exp-card">
+          <div class="exp-number">02</div>
+          <div>
+            <div class="exp-name">Progress Report Data Density</div>
+            <div class="exp-hypo">Hypothesis: Parents who receive a highly specific progress report (session count, score delta, topics covered, next milestone) will have a higher renewal rate vs. those who receive a softer narrative summary, because outcome data justifies the spend.</div>
+            <div class="exp-variants">
+              <span class="variant-pill control">A: Narrative summary</span>
+              <span class="variant-pill">B: Data-first (sessions, scores)</span>
+              <span class="variant-pill">C: Data + narrative hybrid</span>
+            </div>
+          </div>
+          <div class="exp-meta-col">
+            <span class="impact-badge impact-high">High Impact</span>
+            <span class="effort-tag">Med effort</span>
+          </div>
+        </div>
+
+        <div class="exp-card">
+          <div class="exp-number">03</div>
+          <div>
+            <div class="exp-name">Pause vs. Cancel Landing Page</div>
+            <div class="exp-hypo">Hypothesis: Surfacing a "pause for 30 days, free" offer prominently on the cancellation flow will reduce hard cancels by at least 15% by giving cost-sensitive families a lower-stakes option.</div>
+            <div class="exp-variants">
+              <span class="variant-pill control">A: Cancel flow (current)</span>
+              <span class="variant-pill">B: Pause offer prominently featured</span>
+            </div>
+          </div>
+          <div class="exp-meta-col">
+            <span class="impact-badge impact-high">High Impact</span>
+            <span class="effort-tag">Med effort</span>
+          </div>
+        </div>
+
+        <div class="exp-card">
+          <div class="exp-number">04</div>
+          <div>
+            <div class="exp-name">Winback Incentive Type</div>
+            <div class="exp-hypo">Hypothesis: A free month credit will outperform a percentage discount for winback because it removes the month-one barrier (the psychological hurdle for a lapsed subscriber) rather than just reducing cost.</div>
+            <div class="exp-variants">
+              <span class="variant-pill control">A: 20% off first month</span>
+              <span class="variant-pill">B: First month free</span>
+              <span class="variant-pill">C: Free first session only</span>
+            </div>
+          </div>
+          <div class="exp-meta-col">
+            <span class="impact-badge impact-med">Med Impact</span>
+            <span class="effort-tag">Low effort</span>
+          </div>
+        </div>
+
+        <div class="exp-card">
+          <div class="exp-number">05</div>
+          <div>
+            <div class="exp-name">Send-Time Optimization: Parents</div>
+            <div class="exp-hypo">Hypothesis: Parental engagement emails sent at 7–8pm local time (after school pickup, dinner, homework) will outperform 9am sends on CTR because parents are in planning mode in the evening, not the morning.</div>
+            <div class="exp-variants">
+              <span class="variant-pill control">A: 9:00am local</span>
+              <span class="variant-pill">B: 7:30pm local</span>
+            </div>
+          </div>
+          <div class="exp-meta-col">
+            <span class="impact-badge impact-med">Med Impact</span>
+            <span class="effort-tag">Low effort</span>
+          </div>
+        </div>
+
+        <div class="exp-card">
+          <div class="exp-number">06</div>
+          <div>
+            <div class="exp-name">Onboarding Email: Goal-Setting vs. Scheduling CTA</div>
+            <div class="exp-hypo">Hypothesis: Asking new subscribers to "set a learning goal" in the D1 email will produce higher engagement than "book your first session" because it builds identity commitment before asking for a calendar action.</div>
+            <div class="exp-variants">
+              <span class="variant-pill control">A: CTA → Book session</span>
+              <span class="variant-pill">B: CTA → Set a goal</span>
+            </div>
+          </div>
+          <div class="exp-meta-col">
+            <span class="impact-badge impact-med">Med Impact</span>
+            <span class="effort-tag">Low effort</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════ METRICS VIEW ════ -->
+    <div id="view-metrics" class="view">
+      <div class="page-header">
+        <div class="page-eyebrow">Reporting Layer</div>
+        <h1 class="page-title">KPI Dashboard</h1>
+        <p class="page-sub">The metrics that matter for a consumer learning subscription — structured by lifecycle stage and tied to the business outcomes retention marketing owns.</p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Monthly Retention Rate</div>
+          <div class="stat-value">91.2%</div>
+          <div class="stat-delta">↑ +1.4pp MoM</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg LTV (12mo)</div>
+          <div class="stat-value">$1,847</div>
+          <div class="stat-delta">↑ +$214 vs. prior yr</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Winback Rate</div>
+          <div class="stat-value">17.3%</div>
+          <div class="stat-delta neutral">Target: 20%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Email Open Rate</div>
+          <div class="stat-value">38.1%</div>
+          <div class="stat-delta">↑ vs. 22% industry</div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:16px">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">Activation Metrics</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:13px;color:var(--fg2)">First session booked &lt; 7d</span>
+                <span style="font-size:13px;font-weight:700;font-variant-numeric:tabular-nums">68%</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--accent)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:13px;color:var(--fg2)">Onboarding email CTR</span>
+                <span style="font-size:13px;font-weight:700;font-variant-numeric:tabular-nums">16.4%</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill" style="width:55%;background:var(--accent)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:13px;color:var(--fg2)">D7 active rate (≥1 session)</span>
+                <span style="font-size:13px;font-weight:700;font-variant-numeric:tabular-nums">74%</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill" style="width:74%;background:var(--success)"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">Engagement Metrics</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:13px;color:var(--fg2)">Avg sessions/subscriber/month</span>
+                <span style="font-size:13px;font-weight:700;font-variant-numeric:tabular-nums">6.2</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill" style="width:62%;background:var(--accent2)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:13px;color:var(--fg2)">D30 active rate (≥2 sessions)</span>
+                <span style="font-size:13px;font-weight:700;font-variant-numeric:tabular-nums">61%</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill" style="width:61%;background:var(--accent2)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+                <span style="font-size:13px;color:var(--fg2)">Progress email open rate</span>
+                <span style="font-size:13px;font-weight:700;font-variant-numeric:tabular-nums">44.8%</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill" style="width:78%;background:var(--success)"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">30-Day Experiment Results Tracker</div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border)">
+                <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Experiment</th>
+                <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Metric</th>
+                <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Control</th>
+                <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Variant</th>
+                <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Lift</th>
+                <th style="text-align:center;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--border)">
+                <td style="padding:10px 12px;color:var(--fg)">Tutor-sent drift email</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Re-engagement CTR</td>
+                <td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--fg)">7.2%</td>
+                <td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--fg)">11.8%</td>
+                <td style="padding:10px 12px;text-align:right;font-weight:700;color:var(--success)">+64%</td>
+                <td style="padding:10px 12px;text-align:center"><span style="background:rgba(34,197,94,.12);color:var(--success);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700">Winner</span></td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border)">
+                <td style="padding:10px 12px;color:var(--fg)">Evening send time</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Email CTR</td>
+                <td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--fg)">12.1%</td>
+                <td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--fg)">14.3%</td>
+                <td style="padding:10px 12px;text-align:right;font-weight:700;color:var(--success)">+18%</td>
+                <td style="padding:10px 12px;text-align:center"><span style="background:rgba(34,197,94,.12);color:var(--success);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700">Winner</span></td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border)">
+                <td style="padding:10px 12px;color:var(--fg)">Free month vs. 20% off (winback)</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Resubscription rate</td>
+                <td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--fg)">13.4%</td>
+                <td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--fg)">12.9%</td>
+                <td style="padding:10px 12px;text-align:right;font-weight:700;color:var(--danger)">-4%</td>
+                <td style="padding:10px 12px;text-align:center"><span style="background:rgba(239,68,68,.12);color:var(--danger);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700">No win</span></td>
+              </tr>
+              <tr>
+                <td style="padding:10px 12px;color:var(--fg)">Progress data density</td>
+                <td style="padding:10px 12px;color:var(--fg2)">Renewal rate</td>
+                <td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--fg)">88.6%</td>
+                <td style="padding:10px 12px;text-align:right;font-variant-numeric:tabular-nums;color:var(--fg)">—</td>
+                <td style="padding:10px 12px;text-align:right;color:var(--fg3)">—</td>
+                <td style="padding:10px 12px;text-align:center"><span style="background:rgba(245,158,11,.12);color:var(--warn);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700">Running</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── Mobile bottom nav ── -->
+<nav class="bottom-tabs">
+  <div class="bottom-tab-inner">
+    <button class="btab active" onclick="navigate('lifecycle',this)" data-view="lifecycle">
+      <span class="btab-icon">⬡</span> Lifecycle
+    </button>
+    <button class="btab" onclick="navigate('segments',this)" data-view="segments">
+      <span class="btab-icon">◎</span> Segments
+    </button>
+    <button class="btab" onclick="navigate('personas',this)" data-view="personas">
+      <span class="btab-icon">◉</span> Personas
+    </button>
+    <button class="btab" onclick="navigate('campaigns',this)" data-view="campaigns">
+      <span class="btab-icon">✉</span> Campaigns
+    </button>
+    <button class="btab" onclick="navigate('experiments',this)" data-view="experiments">
+      <span class="btab-icon">⚗</span> Tests
+    </button>
+    <button class="btab" onclick="navigate('metrics',this)" data-view="metrics">
+      <span class="btab-icon">▤</span> KPIs
+    </button>
+  </div>
+</nav>
+
+<script>
+function navigate(viewId, triggerEl) {
+  // hide all views
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + viewId).classList.add('active');
+
+  // update sidebar nav items
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.view === viewId);
+  });
+
+  // update bottom tabs
+  document.querySelectorAll('.btab').forEach(b => {
+    b.classList.toggle('active', b.dataset.view === viewId);
+  });
+}
+
+function switchPersonas(which) {
+  document.querySelectorAll('.persona-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.persona-toggle').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + which).classList.add('active');
+  document.getElementById('toggle-' + which).classList.add('active');
+}
+
+function selectStage(stageId) {
+  // visual pulse on click
+  const bars = document.querySelectorAll('.funnel-bar');
+  bars.forEach(b => b.style.opacity = '0.5');
+  event.currentTarget.style.opacity = '1';
+  setTimeout(() => bars.forEach(b => b.style.opacity = '1'), 600);
+}
+</script>
+
+</body></html>
