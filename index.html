@@ -1,986 +1,716 @@
-<title>Nerdy Retention Playbook</title>
-<meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap">
-
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Nerdy · Retention Playbook</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap">
 <style>
-/* ── tokens ── layout: sticky nav + scrollable sections, consumer-only */
 :root {
-  --bg:        #0d1117;
-  --bg2:       #161c26;
-  --bg3:       #1e2636;
-  --border:    #2a3347;
-  --fg:        #e8edf5;
-  --fg2:       #8e9bb5;
-  --fg3:       #5a6680;
-  --accent:    #4f6ef7;
-  --accent2:   #7c3aed;
-  --success:   #10b981;
-  --warn:      #f59e0b;
-  --danger:    #ef4444;
-  --accent-bg: rgba(79,110,247,.13);
-  color-scheme: dark;
-  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
-  --font-body:    'DM Sans', system-ui, sans-serif;
+  --bg:#0a0d1a; --surface:#111527; --surface2:#181d35;
+  --border:rgba(255,255,255,.08); --accent:#5b7fff; --accent2:#8b5cf6;
+  --success:#22c55e; --warn:#f59e0b; --danger:#ef4444;
+  --fg:#eef0f8; --fg2:#9ba3c7; --fg3:#5b6289; --card-r:12px;
+  color-scheme:dark;
 }
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --bg:        #f4f6fc; --bg2: #ffffff; --bg3: #eef1f9; --border: #dce2f0;
-    --fg: #111827; --fg2: #4a5568; --fg3: #9aa3b5;
-    --accent: #3b5bdb; --accent2: #6d28d9; --success: #059669; --warn: #d97706; --danger: #dc2626;
-    --accent-bg: rgba(59,91,219,.09); color-scheme: light;
-  }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.5;background:var(--bg);color:var(--fg);display:flex;flex-direction:column}
+.shell{display:flex;height:100%;min-height:100vh}
+/* Sidebar */
+.sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:24px 0 16px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.logo{padding:0 20px 24px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.logo-eyebrow{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.logo-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--fg)}
+.nav-section-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--fg3);padding:12px 20px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;border-radius:0;transition:background .15s,color .15s;color:var(--fg2);font-size:13.5px;font-weight:500;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--surface2);color:var(--fg)}
+.nav-item.active{background:rgba(91,127,255,.12);color:var(--accent);border-right:2px solid var(--accent)}
+.nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.sidebar-footer{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--fg3)}
+.built-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(91,127,255,.1);border:1px solid rgba(91,127,255,.2);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--accent);font-weight:500}
+/* Main */
+.main{flex:1;min-width:0;overflow-y:auto;padding:32px 32px 64px}
+.view{display:none}
+.view.active{display:block}
+/* Page header */
+.page-header{margin-bottom:28px}
+.page-eyebrow{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.page-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;line-height:1.2;color:var(--fg)}
+.page-sub{margin-top:6px;color:var(--fg2);max-width:560px}
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:28px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--card-r);padding:16px 18px}
+.stat-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3);margin-bottom:6px}
+.stat-value{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--fg);font-variant-numeric:tabular-nums;line-height:1}
+.stat-delta{font-size:12px;color:var(--success);margin-top:4px}
+.stat-delta.down{color:var(--danger)}
+.stat-delta.neutral{color:var(--fg3)}
+/* Card */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--card-r);padding:20px 22px;margin-bottom:16px}
+.card-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--fg);margin-bottom:4px}
+/* Funnel */
+.funnel-wrap{display:grid;gap:0;margin-bottom:8px}
+.funnel-stage{display:grid;grid-template-columns:180px 1fr;gap:0;position:relative}
+.funnel-bar-col{display:flex;align-items:center;padding:10px 0;position:relative}
+.funnel-bar{height:44px;border-radius:6px;display:flex;align-items:center;padding:0 14px;gap:10px;cursor:pointer;transition:filter .15s,transform .1s;min-width:90px}
+.funnel-bar:hover{filter:brightness(1.15);transform:scale(1.01)}
+.funnel-label{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:#fff;white-space:nowrap}
+.funnel-pct{font-size:12px;opacity:.75;color:#fff}
+.funnel-detail-col{padding:10px 0 10px 24px;display:flex;flex-direction:column;justify-content:center}
+.funnel-detail-title{font-size:13px;font-weight:600;color:var(--fg)}
+.funnel-detail-text{font-size:12px;color:var(--fg2);margin-top:2px}
+.funnel-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:2px 9px;font-size:11px;color:var(--fg2)}
+.chip.accent{background:rgba(91,127,255,.12);border-color:rgba(91,127,255,.3);color:var(--accent)}
+/* Bar track */
+.bar-track{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;margin-top:6px}
+.bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
+/* Timeline */
+.timeline{padding-left:18px;border-left:2px solid var(--border)}
+.tl-item{position:relative;padding-bottom:18px;padding-left:16px}
+.tl-item::before{content:'';position:absolute;left:-8px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+.tl-item:last-child{padding-bottom:0}
+.tl-day{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.tl-title{font-size:13.5px;font-weight:600;color:var(--fg);margin:2px 0}
+.tl-desc{font-size:12.5px;color:var(--fg2)}
+/* Segments */
+.seg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:0}
+.seg-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--card-r);padding:18px;cursor:pointer;transition:border-color .15s,transform .1s}
+.seg-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.seg-card.selected{border-color:var(--accent);background:rgba(91,127,255,.06)}
+.seg-icon{font-size:28px;margin-bottom:10px}
+.seg-name{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--fg);margin-bottom:4px}
+.seg-size{font-size:12px;color:var(--fg3);margin-bottom:8px}
+.seg-desc{font-size:13px;color:var(--fg2);line-height:1.5;margin-bottom:10px}
+.seg-signals-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fg3);margin-bottom:5px}
+.signal-row{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--fg2);margin-bottom:3px}
+.signal-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+/* Persona cards */
+.persona-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--card-r);overflow:hidden;display:flex;flex-direction:column}
+.persona-header{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:14px}
+.persona-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.persona-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--fg);line-height:1.2}
+.persona-tagline{font-size:12.5px;color:var(--fg2);margin-top:3px;font-style:italic}
+.persona-meta{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
+.persona-meta-item{font-size:11px;color:var(--fg3)}
+.persona-body{padding:18px 22px;display:flex;flex-direction:column;gap:16px;flex:1}
+.persona-section-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fg3);margin-bottom:6px}
+.persona-quote{background:var(--bg);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:10px 14px;font-size:13px;color:var(--fg2);font-style:italic;line-height:1.5}
+.pain-list,.goal-list{display:flex;flex-direction:column;gap:5px}
+.pain-item,.goal-item{display:flex;align-items:flex-start;gap:7px;font-size:12.5px;color:var(--fg2);line-height:1.4}
+.pain-dot{width:6px;height:6px;border-radius:50%;background:var(--danger);flex-shrink:0;margin-top:5px}
+.goal-dot{width:6px;height:6px;border-radius:50%;background:var(--success);flex-shrink:0;margin-top:5px}
+.persona-message-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.persona-message-angle{font-size:12.5px;color:var(--fg);font-weight:600;margin-bottom:4px}
+.persona-message-detail{font-size:12px;color:var(--fg2);line-height:1.5}
+.risk-label-row{display:flex;justify-content:space-between;font-size:11px;color:var(--fg3);margin-bottom:4px}
+/* Campaign cards */
+.campaign-grid{display:grid;gap:16px}
+.campaign-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--card-r);overflow:hidden}
+.campaign-header{padding:14px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border-bottom:1px solid var(--border)}
+.campaign-stage-badge{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:4px;flex-shrink:0}
+.campaign-name{font-family:'Syne',sans-serif;font-weight:700;font-size:14.5px;color:var(--fg)}
+.campaign-trigger{font-size:12px;color:var(--fg2);margin-top:2px}
+.campaign-body{padding:14px 18px}
+.email-preview{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:12px}
+.email-meta{font-size:11px;color:var(--fg3);margin-bottom:8px}
+.email-subject{font-weight:600;font-size:13.5px;color:var(--fg);margin-bottom:8px}
+.email-body-preview{font-size:12.5px;color:var(--fg2);line-height:1.6}
+.campaign-metrics{display:flex;gap:20px;flex-wrap:wrap}
+.cm-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)}
+.cm-val{font-size:14px;font-weight:700;color:var(--fg);font-variant-numeric:tabular-nums}
+/* Experiment cards */
+.exp-grid{display:grid;gap:14px}
+.exp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--card-r);padding:18px 20px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:start}
+.exp-number{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--fg3);width:28px;text-align:center}
+.exp-name{font-weight:600;font-size:13.5px;color:var(--fg);margin-bottom:4px}
+.exp-hypo{font-size:12.5px;color:var(--fg2);line-height:1.5}
+.exp-variants{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.variant-pill{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--fg2)}
+.variant-pill.control{border-color:rgba(91,127,255,.3);color:var(--accent)}
+.exp-meta-col{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.impact-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.impact-high{background:rgba(34,197,94,.12);color:var(--success)}
+.impact-med{background:rgba(245,158,11,.12);color:var(--warn)}
+.effort-tag{font-size:11px;color:var(--fg3)}
+/* Mobile */
+.bottom-tabs{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:50;padding-bottom:env(safe-area-inset-bottom,0px)}
+.bottom-tab-inner{display:flex;justify-content:space-around}
+.btab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 8px;cursor:pointer;border:none;background:none;color:var(--fg3);font-size:10px;font-weight:500;transition:color .15s}
+.btab.active{color:var(--accent)}
+.btab-icon{font-size:20px}
+@media(max-width:680px){
+  .sidebar{display:none}
+  .bottom-tabs{display:block}
+  .main{padding-bottom:80px}
+  .exp-card{grid-template-columns:1fr}
+  .exp-number{display:none}
+  .exp-meta-col{flex-direction:row;align-items:center}
 }
-:root[data-theme="light"] {
-  --bg: #f4f6fc; --bg2: #ffffff; --bg3: #eef1f9; --border: #dce2f0;
-  --fg: #111827; --fg2: #4a5568; --fg3: #9aa3b5;
-  --accent: #3b5bdb; --accent2: #6d28d9; --success: #059669; --warn: #d97706; --danger: #dc2626;
-  --accent-bg: rgba(59,91,219,.09); color-scheme: light;
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
-html, body { height: 100% }
-body {
-  background: var(--bg); color: var(--fg);
-  font-family: var(--font-body); font-size: 15px; line-height: 1.6;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 0;
-  font-variant-numeric: tabular-nums;
-}
-body::before {
-  content: ""; position: fixed; inset: 0 0 auto;
-  height: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg);
-}
-
-/* ── header ── */
-.page-header {
-  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
-  background: var(--bg); border-bottom: 1px solid var(--border);
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 0;
-}
-.header-inner {
-  max-width: 1100px; margin: 0 auto;
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 20px; height: 58px;
-}
-.logo { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: var(--fg); letter-spacing: -.02em; white-space: nowrap }
-.logo span { color: var(--accent) }
-.badge { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; background: var(--accent-bg); color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); border-radius: 20px; padding: 2px 9px; white-space: nowrap }
-
-nav { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none }
-nav::-webkit-scrollbar { display: none }
-nav button {
-  background: none; border: none; cursor: pointer;
-  font: 500 13px/1 var(--font-body); color: var(--fg3);
-  padding: 6px 12px; border-radius: 6px;
-  transition: color .15s, background .15s; white-space: nowrap;
-}
-nav button:hover { color: var(--fg2); background: var(--bg3) }
-nav button.active { color: var(--accent); background: var(--accent-bg) }
-
-/* ── main ── */
-.main { max-width: 1100px; margin: 0 auto; padding-block: 36px }
-.section { display: none }
-.section.active { display: block }
-
-/* ── type ── */
-.eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px }
-h2 { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--fg); letter-spacing: -.02em; text-wrap: balance; margin-bottom: 6px }
-.lead { color: var(--fg2); margin-bottom: 28px; max-width: 640px }
-.divider { border: none; border-top: 1px solid var(--border); margin: 36px 0 }
-
-/* ── stat row ── */
-.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 40px }
-.stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; min-width: 0 }
-.stat-card .s-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--fg3); margin-bottom: 6px }
-.stat-card .s-val { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--fg); letter-spacing: -.03em; line-height: 1 }
-.stat-card .s-sub { font-size: 12px; color: var(--fg3); margin-top: 4px }
-.stat-card .s-delta { font-size: 12px; color: var(--success); font-weight: 600; margin-top: 4px }
-.stat-card .s-warn  { font-size: 12px; color: var(--warn);    font-weight: 600; margin-top: 4px }
-
-/* ── lifecycle ── */
-.lifecycle { display: grid; grid-template-columns: repeat(5,1fr); gap: 0; margin-bottom: 40px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border) }
-.lc { background: var(--bg2); padding: 18px 16px; border-right: 1px solid var(--border); min-width: 0 }
-.lc:last-child { border-right: none }
-.lc-num { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--fg3); margin-bottom: 4px }
-.lc-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--fg); margin-bottom: 8px }
-.lc-days { font-size: 12px; color: var(--fg3); margin-bottom: 6px }
-.lc-trigger { font-size: 12px; color: var(--fg2); margin-bottom: 10px }
-.lc-goal { font-size: 11px; font-weight: 600; color: var(--success); background: rgba(16,185,129,.1); border-radius: 4px; padding: 2px 7px; display: inline-block }
-
-/* ── signal cards ── */
-.signals { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 40px }
-.sig { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 18px; position: relative; overflow: hidden }
-.sig::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px }
-.sig-1::before { background: var(--success) }
-.sig-2::before { background: var(--accent) }
-.sig-3::before { background: var(--warn) }
-.sig-4::before { background: var(--danger) }
-.sig-day { font-family: var(--font-display); font-size: 30px; font-weight: 700; color: var(--fg3); line-height: 1; margin-bottom: 4px }
-.sig-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--fg3); margin-bottom: 8px }
-.sig-trigger { font-size: 13px; color: var(--fg); font-weight: 500; margin-bottom: 6px }
-.sig-action { font-size: 12px; color: var(--fg2) }
-
-/* ── channel row ── */
-.ch-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 28px }
-.ch-pill { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--fg2); background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px }
-.ch-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0 }
-
-/* ── card ── */
-.card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; min-width: 0 }
-.card-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--fg); margin-bottom: 14px; display: flex; align-items: center; gap: 8px }
-.card-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0 }
-
-/* ── two-col ── */
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 40px }
-
-/* ── generic table ── */
-.gt { width: 100%; border-collapse: collapse; font-size: 13px }
-.gt th { text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--fg3); padding: 0 12px 10px 0; border-bottom: 1px solid var(--border) }
-.gt td { padding: 10px 12px 10px 0; vertical-align: top; border-bottom: 1px solid var(--border); color: var(--fg2) }
-.gt tr:last-child td { border-bottom: none }
-.gt .strong { font-weight: 600; color: var(--fg) }
-
-/* ── pct bar ── */
-.pct-bar { height: 4px; background: var(--bg3); border-radius: 2px; margin-top: 4px; width: 80px }
-.pct-fill { height: 100%; border-radius: 2px }
-
-/* ── segment grid ── */
-.seg-grid { display: grid; gap: 12px; margin-bottom: 40px }
-.seg-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: grid; grid-template-columns: 200px 1fr 1fr 200px; gap: 20px; align-items: start; min-width: 0 }
-.seg-card .seg-name { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--fg); margin-bottom: 4px }
-.seg-card .seg-share { font-size: 12px; color: var(--fg3); margin-bottom: 8px }
-.seg-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--fg3); margin-bottom: 4px }
-.seg-val { font-size: 13px; color: var(--fg2) }
-
-/* ── persona cards ── */
-.persona-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 40px }
-.persona-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 22px; min-width: 0 }
-.persona-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 2px 8px; border-radius: 4px; margin-bottom: 10px; display: inline-block }
-.persona-card h3 { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--fg); margin-bottom: 3px }
-.persona-profile { font-size: 12px; color: var(--fg3); margin-bottom: 16px }
-.kv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }
-.kv { background: var(--bg3); border-radius: 8px; padding: 10px }
-.kv.full { grid-column: span 2 }
-.kv .k { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--fg3); margin-bottom: 3px }
-.kv .v { font-size: 12px; color: var(--fg2) }
-.kv.churn-hi { background: rgba(239,68,68,.1) }
-.kv.churn-hi .v { color: var(--danger) }
-.kv.churn-md { background: rgba(245,158,11,.1) }
-.kv.churn-md .v { color: var(--warn) }
-
-/* ── tier cards ── */
-.tier-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 40px }
-.tier-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 22px; min-width: 0 }
-.tier-price { font-family: var(--font-display); font-size: 32px; font-weight: 700; color: var(--fg); letter-spacing: -.04em; line-height: 1; margin-bottom: 4px }
-.tier-hrs { font-size: 13px; color: var(--fg2); margin-bottom: 12px }
-.tier-note { font-size: 12px; color: var(--fg3) }
-
-/* ── campaign cards ── */
-.campaign-grid { display: grid; gap: 16px; margin-bottom: 40px }
-.campaign-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; display: grid; grid-template-columns: 240px 1fr 1fr; gap: 24px; align-items: start; min-width: 0 }
-.c-num { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--fg3); margin-bottom: 4px }
-.c-name { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: var(--fg); margin-bottom: 6px }
-.c-stage { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 10px }
-.c-trigger { font-size: 13px; color: var(--fg2) }
-.s-activation { background: rgba(16,185,129,.15); color: var(--success) }
-.s-engagement  { background: rgba(79,110,247,.15);  color: var(--accent) }
-.s-at-risk     { background: rgba(245,158,11,.15);  color: var(--warn) }
-.s-renewal     { background: rgba(124,58,237,.15);  color: var(--accent2) }
-.s-winback     { background: rgba(239,68,68,.15);   color: var(--danger) }
-.metric-list { display: flex; flex-direction: column; gap: 8px }
-.m-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px }
-.m-lbl { font-size: 12px; color: var(--fg3) }
-.m-val { font-size: 13px; font-weight: 600; color: var(--fg) }
-.touch-list { display: flex; flex-direction: column; gap: 8px }
-.touch { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: var(--fg2) }
-.ch { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 2px 6px; border-radius: 3px; white-space: nowrap; flex-shrink: 0; margin-top: 1px }
-.ch-email { background: rgba(79,110,247,.2);  color: var(--accent) }
-.ch-sms   { background: rgba(16,185,129,.2);  color: var(--success) }
-.ch-push  { background: rgba(245,158,11,.2);  color: var(--warn) }
-
-/* ── experiment table ── */
-.exp-wrap { overflow-x: auto; margin-bottom: 40px }
-.exp-table { width: 100%; border-collapse: collapse; font-size: 13px }
-.exp-table th { text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--fg3); padding: 0 16px 12px 0; border-bottom: 1px solid var(--border); white-space: nowrap }
-.exp-table td { padding: 12px 16px 12px 0; vertical-align: top; border-bottom: 1px solid var(--border); color: var(--fg2) }
-.exp-table tr:last-child td { border-bottom: none }
-.exp-hyp { font-weight: 500; color: var(--fg) }
-.pill { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 2px 8px; border-radius: 10px; white-space: nowrap }
-.p-win  { background: rgba(16,185,129,.2);  color: var(--success) }
-.p-run  { background: rgba(245,158,11,.2);  color: var(--warn) }
-.p-back { background: var(--bg3);           color: var(--fg3) }
-.p-none { background: rgba(239,68,68,.12);  color: var(--danger) }
-.effort { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: .05em }
-.e-hi  { background: rgba(79,110,247,.15); color: var(--accent) }
-.e-med { background: var(--bg3); color: var(--fg3) }
-.e-lo  { background: rgba(16,185,129,.12); color: var(--success) }
-
-/* ── results table ── */
-.results-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 40px }
-.results-wrap table { width: 100%; border-collapse: collapse; font-size: 13px }
-.results-wrap thead th { background: var(--bg3); text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--fg3); padding: 12px 16px; white-space: nowrap }
-.results-wrap tbody td { padding: 14px 16px; border-bottom: 1px solid var(--border); color: var(--fg2) }
-.results-wrap tbody tr:last-child td { border-bottom: none }
-.lift-pos { color: var(--success); font-weight: 700 }
-.lift-neg { color: var(--danger);  font-weight: 700 }
-.lift-neu { color: var(--fg3) }
-
-/* ── kpi grid ── */
-.kpi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 40px }
-.kpi-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 20px }
-.kpi-lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--fg3); margin-bottom: 6px }
-.kpi-val { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--fg); letter-spacing: -.03em; line-height: 1; margin-bottom: 4px }
-.kpi-sub   { font-size: 12px; color: var(--fg3) }
-.kpi-delta { font-size: 12px; font-weight: 600; color: var(--success) }
-.kpi-warn  { font-size: 12px; font-weight: 600; color: var(--warn) }
-.sparkline { display: flex; align-items: flex-end; gap: 3px; height: 30px; margin-top: 10px }
-.bar { flex: 1; border-radius: 2px 2px 0 0; background: var(--accent); opacity: .35 }
-.bar.hi { opacity: 1 }
-
-/* ── responsive ── */
-@media (max-width: 900px) {
-  .seg-card { grid-template-columns: 1fr 1fr }
-  .campaign-card { grid-template-columns: 1fr }
-}
-@media (max-width: 700px) {
-  .stat-row { grid-template-columns: 1fr 1fr }
-  .lifecycle { grid-template-columns: 1fr 1fr }
-  .lc { border-right: none; border-bottom: 1px solid var(--border) }
-  .lc:last-child { border-bottom: none }
-  .signals { grid-template-columns: 1fr 1fr }
-  .two-col { grid-template-columns: 1fr }
-  .seg-card { grid-template-columns: 1fr }
-  .persona-grid { grid-template-columns: 1fr }
-  .tier-grid { grid-template-columns: 1fr }
-  .kpi-grid { grid-template-columns: 1fr 1fr }
-}
-@media (max-width: 480px) {
-  .stat-row { grid-template-columns: 1fr 1fr }
-  .kpi-grid { grid-template-columns: 1fr }
-  .signals { grid-template-columns: 1fr }
-}
-@media (prefers-reduced-motion: reduce) { * { transition: none !important } }
 </style>
-
-<header class="page-header">
-  <div class="header-inner">
-    <span class="logo">Nerdy <span>Retention</span> Playbook</span>
-    <nav id="nav">
-      <button class="active" data-tab="lifecycle">Lifecycle</button>
-      <button data-tab="segments">Segments</button>
-      <button data-tab="personas">Personas</button>
-      <button data-tab="campaigns">Campaigns</button>
-      <button data-tab="experiments">Experiments</button>
-      <button data-tab="metrics">Metrics</button>
-    </nav>
-    <span class="badge">Consumer · 2024</span>
+</head>
+<body>
+<div class="shell">
+<nav class="sidebar">
+  <div class="logo">
+    <div class="logo-eyebrow">Nerdy · Consumer</div>
+    <div class="logo-name">Retention OS</div>
   </div>
-</header>
+  <div class="nav-section-label">Strategy</div>
+  <button class="nav-item active" data-view="lifecycle" onclick="navigate('lifecycle',this)"><span class="nav-icon">⬡</span> Lifecycle Map</button>
+  <button class="nav-item" data-view="segments" onclick="navigate('segments',this)"><span class="nav-icon">◎</span> Segments</button>
+  <button class="nav-item" data-view="personas" onclick="navigate('personas',this)"><span class="nav-icon">◉</span> Personas</button>
+  <div class="nav-section-label">Execution</div>
+  <button class="nav-item" data-view="campaigns" onclick="navigate('campaigns',this)"><span class="nav-icon">✉</span> Campaigns</button>
+  <button class="nav-item" data-view="experiments" onclick="navigate('experiments',this)"><span class="nav-icon">⚗</span> Experiments</button>
+  <div class="nav-section-label">Reporting</div>
+  <button class="nav-item" data-view="metrics" onclick="navigate('metrics',this)"><span class="nav-icon">▤</span> KPI Dashboard</button>
+  <div class="sidebar-footer"><div class="built-badge">⚡ Built with Claude</div></div>
+</nav>
 
-<div class="main">
+<main class="main">
 
-  <!-- ══════════ LIFECYCLE ══════════ -->
-  <div class="section active" id="lifecycle">
-
-    <div class="stat-row">
-      <div class="stat-card"><div class="s-label">Renewal Rate</div><div class="s-val">91.2%</div><div class="s-delta">↑ 1.4pts MoM</div></div>
-      <div class="stat-card"><div class="s-label">12-Month LTV</div><div class="s-val">$1,847</div><div class="s-sub">avg per subscriber</div></div>
-      <div class="stat-card"><div class="s-label">D7 Activation</div><div class="s-val">74%</div><div class="s-sub">session booked in 7 days</div></div>
-      <div class="stat-card"><div class="s-label">Winback Rate</div><div class="s-val">17.3%</div><div class="s-warn">target 20% · gap 2.7pts</div></div>
-    </div>
-
-    <div class="eyebrow">Customer Journey</div>
-    <h2>Consumer Retention Lifecycle</h2>
-    <p class="lead">Five stages from first session to re-entry. Each has a clear trigger, primary play, and success metric.</p>
-
-    <div class="lifecycle">
-      <div class="lc">
-        <div class="lc-num">01</div>
-        <div class="lc-name">Activation</div>
-        <div class="lc-days">Days 0–7</div>
-        <div class="lc-trigger">No session booked 48h after signup</div>
-        <div class="lc-goal">Goal: 74% book D7</div>
+<!-- ══ LIFECYCLE ══ -->
+<div id="view-lifecycle" class="view active">
+  <div class="page-header">
+    <div class="page-eyebrow">Strategy Layer</div>
+    <h1 class="page-title">Consumer Retention Lifecycle</h1>
+    <p class="page-sub">A full-funnel view of Nerdy's consumer customer journey — from first login to long-term renewal and reactivation.</p>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Renewal Rate</div><div class="stat-value">91.2%</div><div class="stat-delta">↑ 1.4pts MoM</div></div>
+    <div class="stat-card"><div class="stat-label">12-Month LTV</div><div class="stat-value">$1,847</div><div class="stat-delta">avg per subscriber</div></div>
+    <div class="stat-card"><div class="stat-label">D7 Activation</div><div class="stat-value">74%</div><div class="stat-delta">session booked in 7d</div></div>
+    <div class="stat-card"><div class="stat-label">Winback Rate</div><div class="stat-value">17.3%</div><div class="stat-delta down">target 20% · gap 2.7pts</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Customer Journey Funnel</div>
+    <div style="color:var(--fg2);font-size:12.5px;margin-bottom:20px">Click any stage to explore signals and tactics</div>
+    <div class="funnel-wrap">
+      <div class="funnel-stage">
+        <div class="funnel-bar-col"><div class="funnel-bar" style="background:linear-gradient(135deg,#5b7fff,#818cf8);width:170px" onclick="selectStage(event)"><span class="funnel-label">Activation</span><span class="funnel-pct">100%</span></div></div>
+        <div class="funnel-detail-col">
+          <div class="funnel-detail-title">Days 0–7: First session success</div>
+          <div class="funnel-detail-text">Parent books first tutoring session; student attends and rates it. Make-or-break moment for the entire subscription.</div>
+          <div class="funnel-chips"><span class="chip accent">Onboarding email D1</span><span class="chip accent">Session reminder SMS</span><span class="chip">Match quality survey</span><span class="chip">In-app welcome flow</span></div>
+        </div>
       </div>
-      <div class="lc">
-        <div class="lc-num">02</div>
-        <div class="lc-name">Engagement</div>
-        <div class="lc-days">Days 8–60</div>
-        <div class="lc-trigger">&lt;1 session/week by Day 14</div>
-        <div class="lc-goal">Goal: 6.2 sessions/mo</div>
+      <div class="funnel-stage">
+        <div class="funnel-bar-col"><div class="funnel-bar" style="background:linear-gradient(135deg,#4f6fe8,#7c3aed);width:148px" onclick="selectStage(event)"><span class="funnel-label">Engagement</span><span class="funnel-pct">78%</span></div></div>
+        <div class="funnel-detail-col">
+          <div class="funnel-detail-title">Days 8–60: Build the habit loop</div>
+          <div class="funnel-detail-text">Regular session cadence, progress milestones, feature discovery. Low engagement at 30d is the #1 churn predictor.</div>
+          <div class="funnel-chips"><span class="chip accent">Progress digest email</span><span class="chip accent">Usage nudge at D14</span><span class="chip">Goal check-in push</span><span class="chip">Tutor relationship email</span></div>
+        </div>
       </div>
-      <div class="lc">
-        <div class="lc-num">03</div>
-        <div class="lc-name">At-Risk</div>
-        <div class="lc-days">Day 30+</div>
-        <div class="lc-trigger">No login 10 days · no session 14 days</div>
-        <div class="lc-goal">Goal: 22–28% save rate</div>
+      <div class="funnel-stage">
+        <div class="funnel-bar-col"><div class="funnel-bar" style="background:linear-gradient(135deg,#7c3aed,#a855f7);width:126px" onclick="selectStage(event)"><span class="funnel-label">At-Risk</span><span class="funnel-pct">61%</span></div></div>
+        <div class="funnel-detail-col">
+          <div class="funnel-detail-title">Signal: ↓ session freq or no login 10+ days</div>
+          <div class="funnel-detail-text">Triggered intervention window. These customers haven't cancelled yet — speed and personalization win here.</div>
+          <div class="funnel-chips"><span class="chip accent">Personalized save sequence</span><span class="chip accent">Pause offer</span><span class="chip">CS outreach trigger</span><span class="chip">Outcome reminder</span></div>
+        </div>
       </div>
-      <div class="lc">
-        <div class="lc-num">04</div>
-        <div class="lc-name">Renewal</div>
-        <div class="lc-days">Day 60+</div>
-        <div class="lc-trigger">Renewal window opens at D-30</div>
-        <div class="lc-goal">Goal: 88–92% renew</div>
+      <div class="funnel-stage">
+        <div class="funnel-bar-col"><div class="funnel-bar" style="background:linear-gradient(135deg,#0ea5e9,#5b7fff);width:110px" onclick="selectStage(event)"><span class="funnel-label">Renewal</span><span class="funnel-pct">54%</span></div></div>
+        <div class="funnel-detail-col">
+          <div class="funnel-detail-title">Days 50–90: Lock in next cycle</div>
+          <div class="funnel-detail-text">ROI-focused messaging tied to student outcomes. Progress report + upcoming season make the renewal case concrete.</div>
+          <div class="funnel-chips"><span class="chip accent">Progress report email</span><span class="chip accent">Early renewal offer D60</span><span class="chip">Back-to-school sequence</span><span class="chip">Upgrade upsell</span></div>
+        </div>
       </div>
-      <div class="lc">
-        <div class="lc-num">05</div>
-        <div class="lc-name">Winback</div>
-        <div class="lc-days">Post-cancel</div>
-        <div class="lc-trigger">Cancelled 1–90 days ago · had ≥1 session</div>
-        <div class="lc-goal">Goal: 28–35% open rate</div>
-      </div>
-    </div>
-
-    <div class="eyebrow">Early Warning</div>
-    <h2>Churn Signals</h2>
-    <p class="lead">Day-based behavioral triggers that fire automated responses before a subscriber reaches a cancel decision.</p>
-
-    <div class="signals">
-      <div class="sig sig-1">
-        <div class="sig-day">3</div>
-        <div class="sig-lbl">Day Signal</div>
-        <div class="sig-trigger">No session booked after signup</div>
-        <div class="sig-action">Email + SMS · book first session CTA</div>
-      </div>
-      <div class="sig sig-2">
-        <div class="sig-day">14</div>
-        <div class="sig-lbl">Day Signal</div>
-        <div class="sig-trigger">Fewer than 1 session per week</div>
-        <div class="sig-action">Habit-building tips · surface scheduler</div>
-      </div>
-      <div class="sig sig-3">
-        <div class="sig-day">30</div>
-        <div class="sig-lbl">Day Signal</div>
-        <div class="sig-trigger">No login in 10 days</div>
-        <div class="sig-action">Flag high-risk · move to save sequence</div>
-      </div>
-      <div class="sig sig-4">
-        <div class="sig-day">60</div>
-        <div class="sig-lbl">Day Signal</div>
-        <div class="sig-trigger">Renewal window opens</div>
-        <div class="sig-action">Progress report + renewal email series</div>
+      <div class="funnel-stage">
+        <div class="funnel-bar-col"><div class="funnel-bar" style="background:linear-gradient(135deg,#ef4444,#f97316);width:82px" onclick="selectStage(event)"><span class="funnel-label">Winback</span><span class="funnel-pct">23%</span></div></div>
+        <div class="funnel-detail-col">
+          <div class="funnel-detail-title">Post-cancel: Days 1–90 re-entry</div>
+          <div class="funnel-detail-text">Cancelled customers have seen value — they need the right timing and incentive. New school year is the highest-converting re-entry moment.</div>
+          <div class="funnel-chips"><span class="chip accent">3-touch winback sequence</span><span class="chip accent">Seasonal re-entry offer</span><span class="chip">New feature announcement</span><span class="chip">Social proof email</span></div>
+        </div>
       </div>
     </div>
-
-    <div class="divider"></div>
-
-    <div class="eyebrow">Channel Strategy</div>
-    <h2>Channel Roles</h2>
-    <p class="lead">Each channel has a defined role. Email is primary; SMS and push are reserved for high-signal moments.</p>
-
-    <div class="ch-row">
-      <div class="ch-pill"><div class="ch-dot" style="background:var(--accent)"></div>Email — primary lifecycle channel</div>
-      <div class="ch-pill"><div class="ch-dot" style="background:var(--success)"></div>SMS — high-urgency triggers only</div>
-      <div class="ch-pill"><div class="ch-dot" style="background:var(--warn)"></div>Push — session reminders</div>
-      <div class="ch-pill"><div class="ch-dot" style="background:var(--accent2)"></div>In-app — onboarding</div>
-      <div class="ch-pill"><div class="ch-dot" style="background:var(--danger)"></div>Paid retargeting — winback only</div>
-    </div>
-
-  </div><!-- /lifecycle -->
-
-  <!-- ══════════ SEGMENTS ══════════ -->
-  <div class="section" id="segments">
-
-    <div class="eyebrow">Behavioral Cohorts</div>
-    <h2>Consumer Segments</h2>
-    <p class="lead">Five subscriber cohorts defined by usage behavior, not demographics. Segments are dynamic — subscribers move between them as behavior changes.</p>
-
-    <div class="seg-grid">
-
-      <div class="seg-card">
-        <div>
-          <div class="seg-name">Power Learners</div>
-          <div class="seg-share">~18% of base</div>
-          <div class="pct-bar"><div class="pct-fill" style="width:18%;background:var(--success)"></div></div>
-        </div>
-        <div>
-          <div class="seg-label">Key Signals</div>
-          <div class="seg-val">3+ sessions/week · avg tutor rating 4.7+ · 30-day login streak</div>
-        </div>
-        <div>
-          <div class="seg-label">Primary Plays</div>
-          <div class="seg-val">Referral ask · upsell to higher tier · loyalty milestone</div>
-        </div>
-        <div>
-          <div class="seg-label">Retention Risk</div>
-          <div class="seg-val" style="color:var(--success)">Low — highly engaged, high NPS</div>
-        </div>
-      </div>
-
-      <div class="seg-card">
-        <div>
-          <div class="seg-name">Consistent Engagers</div>
-          <div class="seg-share">~31% of base</div>
-          <div class="pct-bar"><div class="pct-fill" style="width:31%;background:var(--accent)"></div></div>
-        </div>
-        <div>
-          <div class="seg-label">Key Signals</div>
-          <div class="seg-val">1–2 sessions/week · weekly logins · opens progress emails</div>
-        </div>
-        <div>
-          <div class="seg-label">Primary Plays</div>
-          <div class="seg-val">Progress digest · goal check-in · early renewal nudge</div>
-        </div>
-        <div>
-          <div class="seg-label">Retention Risk</div>
-          <div class="seg-val" style="color:var(--accent)">Medium-Low — steady but can drift</div>
-        </div>
-      </div>
-
-      <div class="seg-card">
-        <div>
-          <div class="seg-name">Drifters</div>
-          <div class="seg-share">~24% of base</div>
-          <div class="pct-bar"><div class="pct-fill" style="width:24%;background:var(--warn)"></div></div>
-        </div>
-        <div>
-          <div class="seg-label">Key Signals</div>
-          <div class="seg-val">10–21 day session gap · logins down 50% · last email unopened</div>
-        </div>
-        <div>
-          <div class="seg-label">Primary Plays</div>
-          <div class="seg-val">Re-engagement sequence · tutor-sent message · pause offer</div>
-        </div>
-        <div>
-          <div class="seg-label">Retention Risk</div>
-          <div class="seg-val" style="color:var(--warn)">High — primary churn cohort</div>
-        </div>
-      </div>
-
-      <div class="seg-card">
-        <div>
-          <div class="seg-name">New Activators</div>
-          <div class="seg-share">~15% of base</div>
-          <div class="pct-bar"><div class="pct-fill" style="width:15%;background:var(--accent2)"></div></div>
-        </div>
-        <div>
-          <div class="seg-label">Key Signals</div>
-          <div class="seg-val">Signed up &lt;30 days · no session habit yet · exploring platform</div>
-        </div>
-        <div>
-          <div class="seg-label">Primary Plays</div>
-          <div class="seg-val">First-session series · Day 7 check-in · tutor match refinement</div>
-        </div>
-        <div>
-          <div class="seg-label">Retention Risk</div>
-          <div class="seg-val" style="color:var(--accent2)">High until first habit forms</div>
-        </div>
-      </div>
-
-      <div class="seg-card">
-        <div>
-          <div class="seg-name">Lapsed / Cancelled</div>
-          <div class="seg-share">~12% of churned</div>
-          <div class="pct-bar"><div class="pct-fill" style="width:12%;background:var(--danger)"></div></div>
-        </div>
-        <div>
-          <div class="seg-label">Key Signals</div>
-          <div class="seg-val">Cancelled 1–90 days ago · had ≥1 session · cited pause or cost</div>
-        </div>
-        <div>
-          <div class="seg-label">Primary Plays</div>
-          <div class="seg-val">3-touch winback · seasonal re-entry · new-feature proof</div>
-        </div>
-        <div>
-          <div class="seg-label">Winback Window</div>
-          <div class="seg-val" style="color:var(--danger)">1–90 days post-cancel · back-to-school triggers</div>
-        </div>
-      </div>
-
-    </div>
-
-  </div><!-- /segments -->
-
-  <!-- ══════════ PERSONAS ══════════ -->
-  <div class="section" id="personas">
-
-    <div class="eyebrow">Consumer Archetypes</div>
-    <h2>Personas</h2>
-    <p class="lead">Four parent archetypes behind the segments. Each has a distinct motivation, churn trigger, and save offer. Messaging must match their core need — not a generic value prop.</p>
-
-    <div class="persona-grid">
-
-      <div class="persona-card">
-        <div class="persona-tag" style="background:rgba(79,110,247,.15);color:var(--accent)">Outcome Driver</div>
-        <h3>The Outcome Driver</h3>
-        <p class="persona-profile">Parent 38–50 · suburban · HHI $120k+ · buys 30-hr tier</p>
-        <div class="kv-grid">
-          <div class="kv"><div class="k">Core Need</div><div class="v">Measurable grade &amp; score gains</div></div>
-          <div class="kv churn-hi"><div class="k">Churn Risk</div><div class="v">High if no visible progress by Day 30</div></div>
-          <div class="kv full"><div class="k">Save Offer</div><div class="v">Tutor swap + free session · data-led progress report with grade delta</div></div>
-          <div class="kv full"><div class="k">Messaging Angle</div><div class="v">Lead with numbers. Show sessions completed, skills mastered, grade improvement. Never lead with warmth — lead with proof.</div></div>
-        </div>
-      </div>
-
-      <div class="persona-card">
-        <div class="persona-tag" style="background:rgba(16,185,129,.15);color:var(--success)">Rescue Parent</div>
-        <h3>The Rescue Parent</h3>
-        <p class="persona-profile">Parent 35–48 · any market · starts 9-hr then upsells</p>
-        <div class="kv-grid">
-          <div class="kv"><div class="k">Core Need</div><div class="v">Prevent failure, restore confidence</div></div>
-          <div class="kv churn-md"><div class="k">Churn Risk</div><div class="v">Medium-high if tutor fit feels wrong</div></div>
-          <div class="kv full"><div class="k">Save Offer</div><div class="v">Free tutor swap, no questions asked · early win story from tutor</div></div>
-          <div class="kv full"><div class="k">Messaging Angle</div><div class="v">Warmth and reassurance first. One early win from the tutor is worth more than ten data points. Empathy before outcomes.</div></div>
-        </div>
-      </div>
-
-      <div class="persona-card">
-        <div class="persona-tag" style="background:rgba(124,58,237,.15);color:var(--accent2)">Busy Optimizer</div>
-        <h3>The Busy Optimizer</h3>
-        <p class="persona-profile">Working parent 32–45 · dual income · 15-hr tier</p>
-        <div class="kv-grid">
-          <div class="kv"><div class="k">Core Need</div><div class="v">Minimal friction, autopilot scheduling</div></div>
-          <div class="kv churn-md"><div class="k">Churn Risk</div><div class="v">Medium — seasonal schedule drift</div></div>
-          <div class="kv full"><div class="k">Save Offer</div><div class="v">30-day free pause · one-tap reschedule · session reminder push</div></div>
-          <div class="kv full"><div class="k">Messaging Angle</div><div class="v">Remove friction from every touchpoint. Short emails. One CTA. Never ask them to do something — do it for them and confirm it's done.</div></div>
-        </div>
-      </div>
-
-      <div class="persona-card">
-        <div class="persona-tag" style="background:rgba(245,158,11,.15);color:var(--warn)">Value Validator</div>
-        <h3>The Value Validator</h3>
-        <p class="persona-profile">Parent 30–52 · HHI $60–90k · 9-hr tier</p>
-        <div class="kv-grid">
-          <div class="kv"><div class="k">Core Need</div><div class="v">Cost-per-session justification</div></div>
-          <div class="kv churn-hi"><div class="k">Churn Risk</div><div class="v">High — low usage near renewal</div></div>
-          <div class="kv full"><div class="k">Save Offer</div><div class="v">Usage boost + one free session · per-session cost breakdown</div></div>
-          <div class="kv full"><div class="k">Messaging Angle</div><div class="v">Math only. $58/hr vs $80–120/hr in-person. Show cost-per-session used. Tier upgrade pitch: $2/hr cheaper at 15 hrs, $8/hr cheaper at 30 hrs.</div></div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="eyebrow">Subscription Tiers</div>
-    <h2>Pricing Reference</h2>
-    <p class="lead">Three tiers. Renewal sequences surface upgrade paths from Starter. Value Validator messaging uses per-hour math to justify both retention and upsell.</p>
-
-    <div class="tier-grid">
-      <div class="tier-card" style="border-top:3px solid var(--fg3)">
-        <div class="eyebrow" style="color:var(--fg3)">Starter</div>
-        <div class="tier-price">$525</div>
-        <div class="tier-hrs">9 hours · ~$58/hr</div>
-        <div class="tier-note">Rescue Parent and Value Validator entry point. Primary upsell target at renewal.</div>
-      </div>
-      <div class="tier-card" style="border-top:3px solid var(--accent)">
-        <div class="eyebrow">Most Popular</div>
-        <div class="tier-price">$795</div>
-        <div class="tier-hrs">15 hours · ~$53/hr</div>
-        <div class="tier-note">Busy Optimizer home tier. Upgrade pitch: $5/hr less than Starter per session used.</div>
-      </div>
-      <div class="tier-card" style="border-top:3px solid var(--accent2)">
-        <div class="eyebrow" style="color:var(--accent2)">Best Value</div>
-        <div class="tier-price">$1,495</div>
-        <div class="tier-hrs">30 hours · ~$50/hr</div>
-        <div class="tier-note">Outcome Driver home tier. Best per-hour rate — lead with math in renewal sequence.</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px">Key Churn Signals</div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-day">Day 3</div><div class="tl-title">No session booked post-signup</div><div class="tl-desc">Trigger immediate email + SMS to book first session</div></div>
+        <div class="tl-item"><div class="tl-day">Day 14</div><div class="tl-title">Session frequency &lt; 1/week</div><div class="tl-desc">Send habit-building tips; surface scheduler</div></div>
+        <div class="tl-item"><div class="tl-day">Day 30</div><div class="tl-title">No login in 10 days</div><div class="tl-desc">High-risk flag; escalate to save sequence</div></div>
+        <div class="tl-item"><div class="tl-day">Day 60</div><div class="tl-title">Pre-renewal window opens</div><div class="tl-desc">Progress report + renewal email series begins</div></div>
       </div>
     </div>
-
-  </div><!-- /personas -->
-
-  <!-- ══════════ CAMPAIGNS ══════════ -->
-  <div class="section" id="campaigns">
-
-    <div class="eyebrow">Execution Layer</div>
-    <h2>Consumer Campaign Library</h2>
-    <p class="lead">Five trigger-based programs mapped to lifecycle stage. All automatable in Braze. All buildable solo with the agent stack.</p>
-
-    <div class="ch-row" style="margin-bottom:32px">
-      <div class="ch-pill"><div class="ch-dot" style="background:var(--accent)"></div>Email — primary</div>
-      <div class="ch-pill"><div class="ch-dot" style="background:var(--success)"></div>SMS — urgent triggers</div>
-      <div class="ch-pill"><div class="ch-dot" style="background:var(--warn)"></div>Push — reminders</div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px">Channel Mix by Stage</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12.5px;color:var(--fg2)">Email (lifecycle)</span><span style="font-size:12.5px;font-weight:600">Primary</span></div><div class="bar-track"><div class="bar-fill" style="width:90%;background:var(--accent)"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12.5px;color:var(--fg2)">SMS (triggers)</span><span style="font-size:12.5px;font-weight:600">High urgency</span></div><div class="bar-track"><div class="bar-fill" style="width:72%;background:var(--accent2)"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12.5px;color:var(--fg2)">Push notifications</span><span style="font-size:12.5px;font-weight:600">Session reminders</span></div><div class="bar-track"><div class="bar-fill" style="width:65%;background:var(--success)"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12.5px;color:var(--fg2)">In-app / web</span><span style="font-size:12.5px;font-weight:600">Onboarding</span></div><div class="bar-track"><div class="bar-fill" style="width:55%;background:var(--warn)"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12.5px;color:var(--fg2)">Paid retargeting</span><span style="font-size:12.5px;font-weight:600">Winback only</span></div><div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--danger)"></div></div></div>
+      </div>
     </div>
+  </div>
+</div>
 
-    <div class="campaign-grid">
-
-      <div class="campaign-card">
-        <div>
-          <div class="c-num">Campaign 01</div>
-          <div class="c-name">First Session Success</div>
-          <div class="c-stage s-activation">Activation</div>
-          <div class="c-trigger">Triggered: no session booked 48h after signup · 3 touches: D0, D2, D5</div>
-        </div>
-        <div class="metric-list">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fg3);margin-bottom:4px">Targets</div>
-          <div class="m-row"><span class="m-lbl">Open rate</span><span class="m-val">38–42%</span></div>
-          <div class="m-row"><span class="m-lbl">CTR</span><span class="m-val">14–18%</span></div>
-          <div class="m-row"><span class="m-lbl">Goal</span><span class="m-val">Session booked</span></div>
-          <div class="m-row"><span class="m-lbl">Test</span><span class="m-val">Subject + CTA copy</span></div>
-        </div>
-        <div class="touch-list">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fg3);margin-bottom:4px">Touches</div>
-          <div class="touch"><span class="ch ch-email">Email</span>D0 · Welcome + book your first session</div>
-          <div class="touch"><span class="ch ch-sms">SMS</span>D2 · Nudge with scheduler link</div>
-          <div class="touch"><span class="ch ch-email">Email</span>D5 · Tutor intro + student success story</div>
-        </div>
-      </div>
-
-      <div class="campaign-card">
-        <div>
-          <div class="c-num">Campaign 02</div>
-          <div class="c-name">Monthly Progress Digest</div>
-          <div class="c-stage s-engagement">Engagement</div>
-          <div class="c-trigger">Sent monthly · personalized by subject and session count</div>
-        </div>
-        <div class="metric-list">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fg3);margin-bottom:4px">Targets</div>
-          <div class="m-row"><span class="m-lbl">Open rate</span><span class="m-val">40–48%</span></div>
-          <div class="m-row"><span class="m-lbl">CTR</span><span class="m-val">18–24%</span></div>
-          <div class="m-row"><span class="m-lbl">Goal</span><span class="m-val">Renewal rate lift</span></div>
-          <div class="m-row"><span class="m-lbl">Test</span><span class="m-val">Data density</span></div>
-        </div>
-        <div class="touch-list">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fg3);margin-bottom:4px">Content</div>
-          <div class="touch"><span class="ch ch-email">Email</span>Session count + grade/skill delta</div>
-          <div class="touch"><span class="ch ch-email">Email</span>Tutor note + next month goal</div>
-          <div class="touch"><span class="ch ch-push">Push</span>"Your child's progress report is ready"</div>
-        </div>
-      </div>
-
-      <div class="campaign-card">
-        <div>
-          <div class="c-num">Campaign 03</div>
-          <div class="c-name">Drift Save Sequence</div>
-          <div class="c-stage s-at-risk">At-Risk</div>
-          <div class="c-trigger">Triggered: no login 10+ days + no session 14 days · subscribers at Day 30+</div>
-        </div>
-        <div class="metric-list">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fg3);margin-bottom:4px">Targets</div>
-          <div class="m-row"><span class="m-lbl">Save rate</span><span class="m-val">22–28%</span></div>
-          <div class="m-row"><span class="m-lbl">SMS CTR</span><span class="m-val">9–12%</span></div>
-          <div class="m-row"><span class="m-lbl">Goal</span><span class="m-val">Session rebooked</span></div>
-          <div class="m-row"><span class="m-lbl">Test</span><span class="m-val">Tutor-sent vs. brand-sent</span></div>
-        </div>
-        <div class="touch-list">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fg3);margin-bottom:4px">Touches</div>
-          <div class="touch"><span class="ch ch-email">Email</span>Tutor-sent re-engagement (+64% CTR lift)</div>
-          <div class="touch"><span class="ch ch-sms">SMS</span>3 days later · pause offer reply option</div>
-          <div class="touch"><span class="ch ch-email">Email</span>Final · tutor swap offer</div>
-        </div>
-      </div>
-
-      <div class="campaign-card">
-        <div>
-          <div class="c-num">Campaign 04</div>
-          <div class="c-name">Pre-Renewal ROI</div>
-          <div class="c-stage s-renewal">Renewal</div>
-          <div class="c-trigger">Triggered: 30 days before renewal · 4 email touches D-30 through D-3</div>
-        </div>
-        <div class="metric-list">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fg3);margin-bottom:4px">Targets</div>
-          <div class="m-row"><span class="m-lbl">Renewal rate</span><span class="m-val">88–92%</span></div>
-          <div class="m-row"><span class="m-lbl">Upsell rate</span><span class="m-val">12–18%</span></div>
-          <div class="m-row"><span class="m-lbl">Goal</span><span class="m-val">Subscription renewed</span></div>
-          <div class="m-row"><span class="m-lbl">Test</span><span class="m-val">Progress vs. testimonial</span></div>
-        </div>
-        <div class="touch-list">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fg3);margin-bottom:4px">Touches</div>
-          <div class="touch"><span class="ch ch-email">Email</span>D-30 · Progress summary + annual plan (20% off)</div>
-          <div class="touch"><span class="ch ch-email">Email</span>D-14 · Usage stats + per-session cost math</div>
-          <div class="touch"><span class="ch ch-email">Email</span>D-7 · Tier upgrade offer for 9-hr customers</div>
-          <div class="touch"><span class="ch ch-email">Email</span>D-3 · Final reminder + one-click renew</div>
-        </div>
-      </div>
-
-      <div class="campaign-card">
-        <div>
-          <div class="c-num">Campaign 05</div>
-          <div class="c-name">Back-to-School Re-Entry</div>
-          <div class="c-stage s-winback">Winback</div>
-          <div class="c-trigger">Triggered: cancelled 1–90 days ago · calendar triggers in August + January · 3 touches, 2x/year</div>
-        </div>
-        <div class="metric-list">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fg3);margin-bottom:4px">Targets</div>
-          <div class="m-row"><span class="m-lbl">Open rate</span><span class="m-val">28–35%</span></div>
-          <div class="m-row"><span class="m-lbl">Win rate</span><span class="m-val">14–20%</span></div>
-          <div class="m-row"><span class="m-lbl">Goal</span><span class="m-val">Resubscribed</span></div>
-          <div class="m-row"><span class="m-lbl">Test</span><span class="m-val">Incentive type</span></div>
-        </div>
-        <div class="touch-list">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--fg3);margin-bottom:4px">Touches</div>
-          <div class="touch"><span class="ch ch-email">Email</span>New year, new tutor · personalized re-match</div>
-          <div class="touch"><span class="ch ch-email">Email</span>What's new · feature proof + offer</div>
-          <div class="touch"><span class="ch ch-sms">SMS</span>Offer expires Aug 31 / Jan 31</div>
-        </div>
-      </div>
-
+<!-- ══ SEGMENTS ══ -->
+<div id="view-segments" class="view">
+  <div class="page-header">
+    <div class="page-eyebrow">Audience Layer</div>
+    <h1 class="page-title">Customer Segments</h1>
+    <p class="page-sub">Five behavioral cohorts defined by usage patterns, session frequency, and subscription health signals.</p>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Renewal Rate</div><div class="stat-value">91.2%</div><div class="stat-delta">↑ 1.4pts MoM</div></div>
+    <div class="stat-card"><div class="stat-label">12-Month LTV</div><div class="stat-value">$1,847</div><div class="stat-delta">avg per subscriber</div></div>
+    <div class="stat-card"><div class="stat-label">D7 Activation</div><div class="stat-value">74%</div><div class="stat-delta">session booked in 7d</div></div>
+    <div class="stat-card"><div class="stat-label">Winback Rate</div><div class="stat-value">17.3%</div><div class="stat-delta down">target 20% · gap 2.7pts</div></div>
+  </div>
+  <div class="seg-grid">
+    <div class="seg-card" onclick="this.classList.toggle('selected')">
+      <div class="seg-icon">🚀</div>
+      <div class="seg-name">Power Learners</div><div class="seg-size">~18% of base · Highest LTV</div>
+      <div class="seg-desc">3+ sessions/week, high tutor ratings, consistent login. Carry the renewal base and are ready for upsell and referral asks.</div>
+      <div class="seg-signals-label">Behavioral Signals</div>
+      <div class="signal-row"><span class="signal-dot" style="background:var(--success)"></span>Sessions ≥ 3/week</div>
+      <div class="signal-row"><span class="signal-dot" style="background:var(--success)"></span>Rating avg 4.7+</div>
+      <div class="signal-row"><span class="signal-dot" style="background:var(--success)"></span>30-day login streak</div>
+      <div class="funnel-chips" style="margin-top:10px"><span class="chip accent">Referral ask</span><span class="chip accent">Upsell upgrade</span><span class="chip">Loyalty milestone</span></div>
     </div>
-  </div><!-- /campaigns -->
+    <div class="seg-card" onclick="this.classList.toggle('selected')">
+      <div class="seg-icon">📅</div>
+      <div class="seg-name">Consistent Engagers</div><div class="seg-size">~31% of base · Core retention target</div>
+      <div class="seg-desc">1–2 sessions/week, stable usage. Reliable subscribers who renew if reminded of progress and kept connected to their goals.</div>
+      <div class="seg-signals-label">Behavioral Signals</div>
+      <div class="signal-row"><span class="signal-dot" style="background:var(--accent)"></span>1–2 sessions/week</div>
+      <div class="signal-row"><span class="signal-dot" style="background:var(--accent)"></span>Weekly app logins</div>
+      <div class="signal-row"><span class="signal-dot" style="background:var(--accent)"></span>Opens progress emails</div>
+      <div class="funnel-chips" style="margin-top:10px"><span class="chip accent">Progress digest</span><span class="chip accent">Goal check-in</span><span class="chip">Early renewal nudge</span></div>
+    </div>
+    <div class="seg-card" onclick="this.classList.toggle('selected')">
+      <div class="seg-icon">⚠️</div>
+      <div class="seg-name">Drifters</div><div class="seg-size">~24% of base · Highest save opportunity</div>
+      <div class="seg-desc">Were active; now sporadic. Usually distracted, not dissatisfied — re-engagement is high-ROI here.</div>
+      <div class="seg-signals-label">Behavioral Signals</div>
+      <div class="signal-row"><span class="signal-dot" style="background:var(--warn)"></span>Session gap 10–21 days</div>
+      <div class="signal-row"><span class="signal-dot" style="background:var(--warn)"></span>Login frequency ↓ 50%</div>
+      <div class="signal-row"><span class="signal-dot" style="background:var(--warn)"></span>Last email unopened</div>
+      <div class="funnel-chips" style="margin-top:10px"><span class="chip accent">Re-engagement sequence</span><span class="chip accent">Tutor message trigger</span><span class="chip">Pause offer</span></div>
+    </div>
+    <div class="seg-card" onclick="this.classList.toggle('selected')">
+      <div class="seg-icon">🆕</div>
+      <div class="seg-name">New Activators</div><div class="seg-size">~15% of base · Highest churn risk</div>
+      <div class="seg-desc">Signed up within 30 days. Haven't built a session habit yet. Every touchpoint shapes their perception of the platform.</div>
+      <div class="seg-signals-label">Behavioral Signals</div>
+      <div class="signal-row"><span class="signal-dot" style="background:var(--accent2)"></span>Signup &lt; 30 days ago</div>
+      <div class="signal-row"><span class="signal-dot" style="background:var(--accent2)"></span>Completed onboarding?</div>
+      <div class="signal-row"><span class="signal-dot" style="background:var(--accent2)"></span>First session rated?</div>
+      <div class="funnel-chips" style="margin-top:10px"><span class="chip accent">First session series</span><span class="chip accent">Day 7 check-in</span><span class="chip">Match refinement offer</span></div>
+    </div>
+    <div class="seg-card" onclick="this.classList.toggle('selected')">
+      <div class="seg-icon">💤</div>
+      <div class="seg-name">Lapsed / Cancelled</div><div class="seg-size">~12% of churned base · Winback pool</div>
+      <div class="seg-desc">Cancelled within 90 days. They know the product — need the right moment and offer to return. School-year timing drives highest re-entry.</div>
+      <div class="seg-signals-label">Behavioral Signals</div>
+      <div class="signal-row"><span class="signal-dot" style="background:var(--danger)"></span>Cancelled 1–90 days ago</div>
+      <div class="signal-row"><span class="signal-dot" style="background:var(--danger)"></span>Had ≥1 session (not ghost)</div>
+      <div class="signal-row"><span class="signal-dot" style="background:var(--danger)"></span>Cancel reason: pause/cost</div>
+      <div class="funnel-chips" style="margin-top:10px"><span class="chip accent">3-touch winback</span><span class="chip accent">Seasonal re-entry</span><span class="chip">New feature proof point</span></div>
+    </div>
+  </div>
+</div>
 
-  <!-- ══════════ EXPERIMENTS ══════════ -->
-  <div class="section" id="experiments">
-
-    <div class="eyebrow">Optimization Layer</div>
-    <h2>Experiment Backlog</h2>
-    <p class="lead">Ranked by impact × effort. High-impact, low-effort tests run first. One experiment per campaign at a time. 95% confidence before calling a winner.</p>
-
-    <div class="exp-wrap">
-      <table class="exp-table">
-        <thead>
-          <tr>
-            <th>#</th><th>Hypothesis</th><th>Metric</th><th>Impact</th><th>Effort</th><th>Status</th>
-          </tr>
-        </thead>
+<!-- ══ PERSONAS ══ -->
+<div id="view-personas" class="view">
+  <div class="page-header">
+    <div class="page-eyebrow">Audience Layer</div>
+    <h1 class="page-title">Consumer Personas</h1>
+    <p class="page-sub">Four parent archetypes driving consumer subscription behavior — each with distinct goals, pain points, and retention levers.</p>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Renewal Rate</div><div class="stat-value">91.2%</div><div class="stat-delta">↑ 1.4pts MoM</div></div>
+    <div class="stat-card"><div class="stat-label">12-Month LTV</div><div class="stat-value">$1,847</div><div class="stat-delta">avg per subscriber</div></div>
+    <div class="stat-card"><div class="stat-label">D7 Activation</div><div class="stat-value">74%</div><div class="stat-delta">session booked in 7d</div></div>
+    <div class="stat-card"><div class="stat-label">Winback Rate</div><div class="stat-value">17.3%</div><div class="stat-delta down">target 20% · gap 2.7pts</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px">
+    <div style="background:rgba(91,127,255,.08);border:1px solid rgba(91,127,255,.2);border-radius:10px;padding:14px 16px;text-align:center"><div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:6px">Starter</div><div style="font-size:22px;font-weight:800;font-family:'Syne',sans-serif;line-height:1">$525</div><div style="font-size:12px;color:var(--fg2);margin-top:4px">9 hours · K–12</div></div>
+    <div style="background:rgba(91,127,255,.13);border:2px solid rgba(91,127,255,.4);border-radius:10px;padding:14px 16px;text-align:center"><div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:var(--accent);border-radius:20px;padding:2px 8px;display:inline-block;margin-bottom:6px">Most Popular</div><div style="font-size:22px;font-weight:800;font-family:'Syne',sans-serif;line-height:1">$795</div><div style="font-size:12px;color:var(--fg2);margin-top:4px">15 hours · K–12</div></div>
+    <div style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25);border-radius:10px;padding:14px 16px;text-align:center"><div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent2);margin-bottom:6px">Best Value</div><div style="font-size:22px;font-weight:800;font-family:'Syne',sans-serif;line-height:1">$1,495</div><div style="font-size:12px;color:var(--fg2);margin-top:4px">30 hours · K–12</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+    <div class="persona-card">
+      <div class="persona-header">
+        <div class="persona-avatar" style="background:rgba(91,127,255,.15)">🎯</div>
+        <div>
+          <div class="persona-name">The Outcome Driver</div>
+          <div class="persona-tagline">"I need to see the grade move."</div>
+          <div class="persona-meta"><span class="persona-meta-item">👤 Parent, 38–50</span><span class="persona-meta-item">💰 HHI $120k+</span><span class="persona-meta-item" style="color:var(--accent2)">🏆 30-hr tier ($1,495)</span></div>
+        </div>
+      </div>
+      <div class="persona-body">
+        <div><div class="persona-section-label">In their words</div><div class="persona-quote">"I'm paying for results. If my kid's grade hasn't moved in 6 weeks, I'm out."</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div><div class="persona-section-label">Goals</div><div class="goal-list"><div class="goal-item"><span class="goal-dot"></span>Grade improvement</div><div class="goal-item"><span class="goal-dot"></span>SAT/ACT score gains</div><div class="goal-item"><span class="goal-dot"></span>College readiness</div></div></div>
+          <div><div class="persona-section-label">Pain Points</div><div class="pain-list"><div class="pain-item"><span class="pain-dot"></span>Progress feels invisible</div><div class="pain-item"><span class="pain-dot"></span>Can't see session details</div><div class="pain-item"><span class="pain-dot"></span>Impatient with slow ramp-up</div></div></div>
+        </div>
+        <div><div class="persona-section-label">Retention Message Angle</div><div class="persona-message-box"><div class="persona-message-angle">Lead with data, always.</div><div class="persona-message-detail">Show specific grade deltas, test score improvements, session counts. The progress report email is their most important touchpoint — make it quantified and undeniable.</div></div></div>
+        <div><div class="persona-section-label">Churn Risk</div><div class="risk-label-row"><span>If no visible progress by day 30</span><span style="font-weight:700;color:var(--danger)">High</span></div><div class="bar-track"><div class="bar-fill" style="width:80%;background:var(--danger)"></div></div></div>
+        <div class="funnel-chips"><span class="chip accent">Progress digest</span><span class="chip accent">Score milestone alert</span><span class="chip">Pre-renewal ROI email</span></div>
+      </div>
+    </div>
+    <div class="persona-card">
+      <div class="persona-header">
+        <div class="persona-avatar" style="background:rgba(239,68,68,.12)">🆘</div>
+        <div>
+          <div class="persona-name">The Rescue Parent</div>
+          <div class="persona-tagline">"My kid is falling behind and I'm scared."</div>
+          <div class="persona-meta"><span class="persona-meta-item">👤 Parent, 35–48</span><span class="persona-meta-item">💰 Mixed income</span><span class="persona-meta-item" style="color:var(--accent)">🚀 Starts 9-hr → upsell 15-hr</span></div>
+        </div>
+      </div>
+      <div class="persona-body">
+        <div><div class="persona-section-label">In their words</div><div class="persona-quote">"His teacher said he might not pass. I don't know what else to do. I just need someone to help him."</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div><div class="persona-section-label">Goals</div><div class="goal-list"><div class="goal-item"><span class="goal-dot"></span>Prevent failure / grade repetition</div><div class="goal-item"><span class="goal-dot"></span>Restore child's confidence</div><div class="goal-item"><span class="goal-dot"></span>Feel like they did everything possible</div></div></div>
+          <div><div class="persona-section-label">Pain Points</div><div class="pain-list"><div class="pain-item"><span class="pain-dot"></span>High anxiety — needs reassurance</div><div class="pain-item"><span class="pain-dot"></span>Worried about tutor fit/trust</div><div class="pain-item"><span class="pain-dot"></span>Unsure if it's "working"</div></div></div>
+        </div>
+        <div><div class="persona-section-label">Retention Message Angle</div><div class="persona-message-box"><div class="persona-message-angle">Reassurance + early wins.</div><div class="persona-message-detail">This persona needs to feel supported, not sold to. Early session feedback, tutor-sent notes, and small wins do more than any discount. Meet their emotional energy with warmth.</div></div></div>
+        <div><div class="persona-section-label">Churn Risk</div><div class="risk-label-row"><span>If tutor feels like a mismatch</span><span style="font-weight:700;color:var(--warn)">Medium-High</span></div><div class="bar-track"><div class="bar-fill" style="width:65%;background:var(--warn)"></div></div></div>
+        <div class="funnel-chips"><span class="chip accent">Tutor check-in email</span><span class="chip accent">Early win celebration</span><span class="chip">Match refinement offer</span></div>
+      </div>
+    </div>
+    <div class="persona-card">
+      <div class="persona-header">
+        <div class="persona-avatar" style="background:rgba(245,158,11,.12)">⏱️</div>
+        <div>
+          <div class="persona-name">The Busy Optimizer</div>
+          <div class="persona-tagline">"This only works if it fits our schedule."</div>
+          <div class="persona-meta"><span class="persona-meta-item">👤 Working parent, 32–45</span><span class="persona-meta-item">💰 Dual income, time-poor</span><span class="persona-meta-item" style="color:var(--accent)">⚡ 15-hr tier ($795)</span></div>
+        </div>
+      </div>
+      <div class="persona-body">
+        <div><div class="persona-section-label">In their words</div><div class="persona-quote">"I want to help, but between work and activities I just can't manage another thing to coordinate."</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div><div class="persona-section-label">Goals</div><div class="goal-list"><div class="goal-item"><span class="goal-dot"></span>Minimal friction, max autopilot</div><div class="goal-item"><span class="goal-dot"></span>Flexible scheduling</div><div class="goal-item"><span class="goal-dot"></span>Feels like a responsible parent</div></div></div>
+          <div><div class="persona-section-label">Pain Points</div><div class="pain-list"><div class="pain-item"><span class="pain-dot"></span>Scheduling friction kills engagement</div><div class="pain-item"><span class="pain-dot"></span>Guilt when they miss sessions</div><div class="pain-item"><span class="pain-dot"></span>Forgets subscription exists</div></div></div>
+        </div>
+        <div><div class="persona-section-label">Retention Message Angle</div><div class="persona-message-box"><div class="persona-message-angle">Remove every possible friction point.</div><div class="persona-message-detail">This persona lapses because life gets in the way, not because they're unhappy. The pause option is critical — it's the difference between a 30-day pause and a permanent cancel.</div></div></div>
+        <div><div class="persona-section-label">Churn Risk</div><div class="risk-label-row"><span>Seasonal drift (summer, holidays)</span><span style="font-weight:700;color:var(--warn)">Medium</span></div><div class="bar-track"><div class="bar-fill" style="width:55%;background:var(--warn)"></div></div></div>
+        <div class="funnel-chips"><span class="chip accent">Scheduling nudge SMS</span><span class="chip accent">Pause offer (drift save)</span><span class="chip">Session reminder push</span></div>
+      </div>
+    </div>
+    <div class="persona-card">
+      <div class="persona-header">
+        <div class="persona-avatar" style="background:rgba(34,197,94,.1)">💳</div>
+        <div>
+          <div class="persona-name">The Value Validator</div>
+          <div class="persona-tagline">"I need to justify this cost every month."</div>
+          <div class="persona-meta"><span class="persona-meta-item">👤 Parent, 30–52</span><span class="persona-meta-item">💰 $60–90k HHI</span><span class="persona-meta-item" style="color:var(--success)">💡 9-hr ($525) · highest risk</span></div>
+        </div>
+      </div>
+      <div class="persona-body">
+        <div><div class="persona-section-label">In their words</div><div class="persona-quote">"It's a lot of money. I want to make sure we're actually using it and it's making a difference."</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div><div class="persona-section-label">Goals</div><div class="goal-list"><div class="goal-item"><span class="goal-dot"></span>Cost per session feels worth it</div><div class="goal-item"><span class="goal-dot"></span>Visible usage (not wasted)</div><div class="goal-item"><span class="goal-dot"></span>Annual plan saves money</div></div></div>
+          <div><div class="persona-section-label">Pain Points</div><div class="pain-list"><div class="pain-item"><span class="pain-dot"></span>Low usage = cancel impulse</div><div class="pain-item"><span class="pain-dot"></span>Sensitive to price increases</div><div class="pain-item"><span class="pain-dot"></span>Comparison-shops alternatives</div></div></div>
+        </div>
+        <div><div class="persona-section-label">Retention Message Angle</div><div class="persona-message-box"><div class="persona-message-angle">Make the math obvious.</div><div class="persona-message-detail">9-hr = $58/hr, 15-hr = $53/hr, 30-hr = $50/hr vs. in-person tutoring at $80–120/hr. Rational math. Frame the upgrade as savings per hour, not a premium tier.</div></div></div>
+        <div><div class="persona-section-label">Churn Risk</div><div class="risk-label-row"><span>Low usage months + renewal date</span><span style="font-weight:700;color:var(--danger)">High</span></div><div class="bar-track"><div class="bar-fill" style="width:75%;background:var(--danger)"></div></div></div>
+        <div class="funnel-chips"><span class="chip accent">Usage summary email</span><span class="chip accent">Annual plan upsell</span><span class="chip">Cost comparison CTA</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:8px">
+    <div class="card-title" style="margin-bottom:14px">Persona → Campaign Mapping</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr style="border-bottom:1px solid var(--border)">
+          <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Persona</th>
+          <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Top Channel</th>
+          <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Primary Hook</th>
+          <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Renewal Lever</th>
+          <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Save Offer</th>
+        </tr></thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td><span class="exp-hyp">Tutor-sent vs. brand-sent drift email</span></td>
-            <td>Re-engagement CTR</td><td>High</td>
-            <td><span class="effort e-lo">Low</span></td>
-            <td><span class="pill p-win">Winner ✓</span></td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td><span class="exp-hyp">Progress report data density: narrative vs. data-first vs. hybrid</span></td>
-            <td>Renewal rate</td><td>High</td>
-            <td><span class="effort e-med">Medium</span></td>
-            <td><span class="pill p-run">Running</span></td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td><span class="exp-hyp">Pause vs. cancel landing page — prominent 30-day free pause offer</span></td>
-            <td>Hard cancel rate</td><td>High</td>
-            <td><span class="effort e-med">Medium</span></td>
-            <td><span class="pill p-back">Backlog</span></td>
-          </tr>
-          <tr>
-            <td>4</td>
-            <td><span class="exp-hyp">Winback incentive: 20% off vs. first month free vs. free first session</span></td>
-            <td>Resubscription rate</td><td>Medium</td>
-            <td><span class="effort e-lo">Low</span></td>
-            <td><span class="pill p-none">No win</span></td>
-          </tr>
-          <tr>
-            <td>5</td>
-            <td><span class="exp-hyp">Send-time optimization: 9:00 AM vs. 7:30 PM local for parents</span></td>
-            <td>Email CTR</td><td>Medium</td>
-            <td><span class="effort e-lo">Low</span></td>
-            <td><span class="pill p-win">Winner ✓</span></td>
-          </tr>
-          <tr>
-            <td>6</td>
-            <td><span class="exp-hyp">Onboarding CTA: book a session vs. set a learning goal</span></td>
-            <td>Onboarding CTR</td><td>Medium</td>
-            <td><span class="effort e-lo">Low</span></td>
-            <td><span class="pill p-back">Backlog</span></td>
-          </tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px;font-weight:600">🎯 Outcome Driver</td><td style="padding:10px 12px;color:var(--fg2)">Email</td><td style="padding:10px 12px;color:var(--fg2)">Grade / score delta data</td><td style="padding:10px 12px;color:var(--fg2)">Annual progress report</td><td style="padding:10px 12px;color:var(--fg2)">Tutor match swap + free session</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px;font-weight:600">🆘 Rescue Parent</td><td style="padding:10px 12px;color:var(--fg2)">Email + tutor message</td><td style="padding:10px 12px;color:var(--fg2)">Reassurance + early win</td><td style="padding:10px 12px;color:var(--fg2)">Confidence milestone</td><td style="padding:10px 12px;color:var(--fg2)">Free tutor swap, no questions</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px;font-weight:600">⏱️ Busy Optimizer</td><td style="padding:10px 12px;color:var(--fg2)">SMS + push</td><td style="padding:10px 12px;color:var(--fg2)">Scheduling ease</td><td style="padding:10px 12px;color:var(--fg2)">Streak / habit hook</td><td style="padding:10px 12px;color:var(--fg2)">30-day free pause</td></tr>
+          <tr><td style="padding:10px 12px;font-weight:600">💳 Value Validator</td><td style="padding:10px 12px;color:var(--fg2)">Email</td><td style="padding:10px 12px;color:var(--fg2)">Cost-per-session math</td><td style="padding:10px 12px;color:var(--fg2)">Annual plan savings offer</td><td style="padding:10px 12px;color:var(--fg2)">Usage boost + 1 free session</td></tr>
         </tbody>
       </table>
     </div>
+  </div>
+</div>
 
-    <div class="eyebrow" style="margin-top:8px">Results</div>
-    <h2>30-Day Results</h2>
-    <p class="lead">Completed and in-flight tests with lift and status.</p>
+<!-- ══ CAMPAIGNS ══ -->
+<div id="view-campaigns" class="view">
+  <div class="page-header">
+    <div class="page-eyebrow">Execution Layer</div>
+    <h1 class="page-title">Campaign Library</h1>
+    <p class="page-sub">Five high-priority campaigns prioritized by impact on retention and lifetime value, each with trigger logic and sample email copy.</p>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Renewal Rate</div><div class="stat-value">91.2%</div><div class="stat-delta">↑ 1.4pts MoM</div></div>
+    <div class="stat-card"><div class="stat-label">12-Month LTV</div><div class="stat-value">$1,847</div><div class="stat-delta">avg per subscriber</div></div>
+    <div class="stat-card"><div class="stat-label">D7 Activation</div><div class="stat-value">74%</div><div class="stat-delta">session booked in 7d</div></div>
+    <div class="stat-card"><div class="stat-label">Winback Rate</div><div class="stat-value">17.3%</div><div class="stat-delta down">target 20% · gap 2.7pts</div></div>
+  </div>
+  <div class="campaign-grid">
+    <div class="campaign-card">
+      <div class="campaign-header">
+        <div><span class="campaign-stage-badge" style="background:rgba(91,127,255,.15);color:var(--accent)">ACTIVATION</span><div class="campaign-name" style="margin-top:6px">First Session Success Sequence</div><div class="campaign-trigger">Trigger: User signs up → no session booked after 48 hours</div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0"><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:rgba(34,197,94,.12);color:var(--success)">High Priority</span><span style="font-size:11px;color:var(--fg3)">3-touch · D0, D2, D5</span></div>
+      </div>
+      <div class="campaign-body">
+        <div class="email-preview">
+          <div class="email-meta">Day 2 · Email</div>
+          <div class="email-subject">Your first tutoring session is waiting, [First name]</div>
+          <div class="email-body-preview">You signed up to help [Student] get ahead — and the right tutor is ready when you are.<br><br>Most families who book their first session within the first week see meaningful progress by month one. It only takes 15 minutes to get matched and scheduled.<br><br><strong>→ Book [Student]'s first session</strong><br><br>If you have any questions, reply to this email — a real person will get back to you within the hour.</div>
+        </div>
+        <div class="campaign-metrics">
+          <div class="cm-item"><div class="cm-label">Target Open Rate</div><div class="cm-val">38–42%</div></div>
+          <div class="cm-item"><div class="cm-label">Target CTR</div><div class="cm-val">14–18%</div></div>
+          <div class="cm-item"><div class="cm-label">Goal</div><div class="cm-val">Session Booked</div></div>
+          <div class="cm-item"><div class="cm-label">Test Variable</div><div class="cm-val">Subject + CTA copy</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="campaign-card">
+      <div class="campaign-header">
+        <div><span class="campaign-stage-badge" style="background:rgba(139,92,246,.15);color:var(--accent2)">ENGAGEMENT</span><div class="campaign-name" style="margin-top:6px">Monthly Progress Digest</div><div class="campaign-trigger">Trigger: Monthly send · Personalized by student subject + session count</div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0"><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:rgba(34,197,94,.12);color:var(--success)">High Priority</span><span style="font-size:11px;color:var(--fg3)">Automated · Monthly</span></div>
+      </div>
+      <div class="campaign-body">
+        <div class="email-preview">
+          <div class="email-meta">Monthly cadence · Email · Dynamic content blocks</div>
+          <div class="email-subject">[Student]'s October: 6 sessions, 2 test scores improved 📈</div>
+          <div class="email-body-preview">This month, [Student] completed 6 sessions with [Tutor] and showed measurable improvement in Algebra II and essay structure.<br><br><strong>Highlights:</strong> Sessions: 6 · Avg rating: 4.8/5 · Topics: Quadratics, Thesis structure<br><br>Coming up: [Student] has a session Thursday at 4pm. The next milestone is the November SAT prep cycle — would you like to add a dedicated prep block?<br><br><strong>→ See full progress report</strong></div>
+        </div>
+        <div class="campaign-metrics">
+          <div class="cm-item"><div class="cm-label">Target Open Rate</div><div class="cm-val">40–48%</div></div>
+          <div class="cm-item"><div class="cm-label">Target CTR</div><div class="cm-val">18–24%</div></div>
+          <div class="cm-item"><div class="cm-label">Goal</div><div class="cm-val">Renewal rate</div></div>
+          <div class="cm-item"><div class="cm-label">Test Variable</div><div class="cm-val">Data density</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="campaign-card">
+      <div class="campaign-header">
+        <div><span class="campaign-stage-badge" style="background:rgba(245,158,11,.12);color:var(--warn)">AT-RISK</span><div class="campaign-name" style="margin-top:6px">Drift Save Sequence</div><div class="campaign-trigger">Trigger: No login 10+ days AND no session in 14 days (subscribed ≥30d)</div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0"><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:rgba(34,197,94,.12);color:var(--success)">Urgent</span><span style="font-size:11px;color:var(--fg3)">3-touch · Email + SMS</span></div>
+      </div>
+      <div class="campaign-body">
+        <div class="email-preview">
+          <div class="email-meta">Touch 1 · Email · Soft re-engagement</div>
+          <div class="email-subject">[Tutor] noticed [Student] hasn't been in recently</div>
+          <div class="email-body-preview">Hi [Parent name],<br><br>[Tutor] wanted us to pass along a note — [Student] hasn't had a session in a couple of weeks, and they're ready when you are.<br><br>Life gets busy. That's completely normal. If scheduling has been the challenge, we can help you find a time that actually sticks.<br><br><strong>→ Schedule next session with [Tutor]</strong> · Or reply "PAUSE" and we'll hold your spot for 30 days, no charge.</div>
+        </div>
+        <div class="campaign-metrics">
+          <div class="cm-item"><div class="cm-label">Target Save Rate</div><div class="cm-val">22–28%</div></div>
+          <div class="cm-item"><div class="cm-label">SMS CTR (T2)</div><div class="cm-val">9–12%</div></div>
+          <div class="cm-item"><div class="cm-label">Goal</div><div class="cm-val">Session rebooked</div></div>
+          <div class="cm-item"><div class="cm-label">Test Variable</div><div class="cm-val">Tutor vs. brand framing</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="campaign-card">
+      <div class="campaign-header">
+        <div><span class="campaign-stage-badge" style="background:rgba(14,165,233,.12);color:#38bdf8">RENEWAL</span><div class="campaign-name" style="margin-top:6px">Pre-Renewal ROI Campaign</div><div class="campaign-trigger">Trigger: 30 days before subscription renewal date</div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0"><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:rgba(34,197,94,.12);color:var(--success)">High Priority</span><span style="font-size:11px;color:var(--fg3)">4-touch · D-30 to D-3</span></div>
+      </div>
+      <div class="campaign-body">
+        <div class="email-preview">
+          <div class="email-meta">Touch 1 of 4 · D-30 · ROI anchor</div>
+          <div class="email-subject">Here's what [Student] accomplished this year with Nerdy</div>
+          <div class="email-body-preview">Before you renew (or not), we thought you should see the full picture.<br><br><strong>[Student]'s year in numbers:</strong><br>✓ 48 sessions completed<br>✓ Grade average improved 1.2 points in Math<br>✓ SAT score up 80 points since August<br>✓ 4.9/5 tutor satisfaction rating<br><br>Your subscription renews on November 14. Continue with the same plan, or explore our Annual plan and save 20%.<br><br><strong>→ Renew and save</strong> · <strong>See all options</strong></div>
+        </div>
+        <div class="campaign-metrics">
+          <div class="cm-item"><div class="cm-label">Target Renewal Rate</div><div class="cm-val">88–92%</div></div>
+          <div class="cm-item"><div class="cm-label">Upsell Rate</div><div class="cm-val">12–18%</div></div>
+          <div class="cm-item"><div class="cm-label">Goal</div><div class="cm-val">Subscription renewed</div></div>
+          <div class="cm-item"><div class="cm-label">Test Variable</div><div class="cm-val">Progress data vs. testimonial</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="campaign-card">
+      <div class="campaign-header">
+        <div><span class="campaign-stage-badge" style="background:rgba(239,68,68,.12);color:var(--danger)">WINBACK</span><div class="campaign-name" style="margin-top:6px">Back-to-School Re-Entry</div><div class="campaign-trigger">Trigger: Cancelled 1–90 days ago + August/January calendar trigger</div></div>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0"><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:rgba(245,158,11,.12);color:var(--warn)">Seasonal</span><span style="font-size:11px;color:var(--fg3)">3-touch · 2× per year</span></div>
+      </div>
+      <div class="campaign-body">
+        <div class="email-preview">
+          <div class="email-meta">Touch 1 · Re-entry email · Urgency + incentive</div>
+          <div class="email-subject">New year, new tutor? [Student] can start this week.</div>
+          <div class="email-body-preview">School's back. Grades matter again. And Nerdy's AI matching has gotten significantly better since you last used us — your tutor options are sharper, scheduling is faster, and the first session is free when you restart.<br><br>We know the timing wasn't right before. Come back when it is — and if this week works, we'll waive your first month's fee and get [Student] matched today.<br><br><strong>→ Restart my subscription</strong><br><br><em>Offer valid through August 31. We'll apply the credit automatically.</em></div>
+        </div>
+        <div class="campaign-metrics">
+          <div class="cm-item"><div class="cm-label">Target Win Rate</div><div class="cm-val">14–20%</div></div>
+          <div class="cm-item"><div class="cm-label">Target Open Rate</div><div class="cm-val">28–35%</div></div>
+          <div class="cm-item"><div class="cm-label">Goal</div><div class="cm-val">Resubscribed</div></div>
+          <div class="cm-item"><div class="cm-label">Test Variable</div><div class="cm-val">Incentive type</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-    <div class="results-wrap">
-      <table>
-        <thead>
-          <tr><th>Experiment</th><th>Metric</th><th>Control</th><th>Variant</th><th>Lift</th><th>Status</th></tr>
-        </thead>
+<!-- ══ EXPERIMENTS ══ -->
+<div id="view-experiments" class="view">
+  <div class="page-header">
+    <div class="page-eyebrow">Optimization Layer</div>
+    <h1 class="page-title">Experiment Backlog</h1>
+    <p class="page-sub">Prioritized A/B and multivariate tests ranked by expected lift vs. implementation effort, grounded in observed drop-off patterns.</p>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Renewal Rate</div><div class="stat-value">91.2%</div><div class="stat-delta">↑ 1.4pts MoM</div></div>
+    <div class="stat-card"><div class="stat-label">12-Month LTV</div><div class="stat-value">$1,847</div><div class="stat-delta">avg per subscriber</div></div>
+    <div class="stat-card"><div class="stat-label">D7 Activation</div><div class="stat-value">74%</div><div class="stat-delta">session booked in 7d</div></div>
+    <div class="stat-card"><div class="stat-label">Winback Rate</div><div class="stat-value">17.3%</div><div class="stat-delta down">target 20% · gap 2.7pts</div></div>
+  </div>
+  <div class="exp-grid">
+    <div class="exp-card">
+      <div class="exp-number">01</div>
+      <div><div class="exp-name">Tutor-Sent vs. Brand-Sent Drift Email</div><div class="exp-hypo">Hypothesis: Emails appearing to come from the student's tutor ("noticed you haven't been in") will outperform brand-sent emails on open rate and re-engagement click because the relationship feels personal, not transactional.</div><div class="exp-variants"><span class="variant-pill control">A: From: Nerdy Team</span><span class="variant-pill">B: From: Sarah (your tutor)</span></div></div>
+      <div class="exp-meta-col"><span class="impact-badge impact-high">High Impact</span><span class="effort-tag">Low effort</span></div>
+    </div>
+    <div class="exp-card">
+      <div class="exp-number">02</div>
+      <div><div class="exp-name">Progress Report Data Density</div><div class="exp-hypo">Hypothesis: Parents who receive a highly specific progress report (session count, score delta, topics covered, next milestone) will have higher renewal rates vs. those who receive a softer narrative summary, because outcome data justifies the spend.</div><div class="exp-variants"><span class="variant-pill control">A: Narrative summary</span><span class="variant-pill">B: Data-first (sessions, scores)</span><span class="variant-pill">C: Data + narrative hybrid</span></div></div>
+      <div class="exp-meta-col"><span class="impact-badge impact-high">High Impact</span><span class="effort-tag">Med effort</span></div>
+    </div>
+    <div class="exp-card">
+      <div class="exp-number">03</div>
+      <div><div class="exp-name">Pause vs. Cancel Landing Page</div><div class="exp-hypo">Hypothesis: Surfacing a "pause for 30 days, free" offer prominently on the cancellation flow will reduce hard cancels by at least 15% by giving cost-sensitive families a lower-stakes option.</div><div class="exp-variants"><span class="variant-pill control">A: Cancel flow (current)</span><span class="variant-pill">B: Pause offer prominently featured</span></div></div>
+      <div class="exp-meta-col"><span class="impact-badge impact-high">High Impact</span><span class="effort-tag">Med effort</span></div>
+    </div>
+    <div class="exp-card">
+      <div class="exp-number">04</div>
+      <div><div class="exp-name">Winback Incentive Type</div><div class="exp-hypo">Hypothesis: A free month credit will outperform a percentage discount for winback because it removes the month-one barrier rather than just reducing cost.</div><div class="exp-variants"><span class="variant-pill control">A: 20% off first month</span><span class="variant-pill">B: First month free</span><span class="variant-pill">C: Free first session only</span></div></div>
+      <div class="exp-meta-col"><span class="impact-badge impact-med">Med Impact</span><span class="effort-tag">Low effort</span></div>
+    </div>
+    <div class="exp-card">
+      <div class="exp-number">05</div>
+      <div><div class="exp-name">Send-Time Optimization: Parents</div><div class="exp-hypo">Hypothesis: Parental engagement emails sent at 7–8pm local time (after school pickup, dinner, homework) will outperform 9am sends on CTR because parents are in planning mode evenings, not mornings.</div><div class="exp-variants"><span class="variant-pill control">A: 9:00am local</span><span class="variant-pill">B: 7:30pm local</span></div></div>
+      <div class="exp-meta-col"><span class="impact-badge impact-med">Med Impact</span><span class="effort-tag">Low effort</span></div>
+    </div>
+    <div class="exp-card">
+      <div class="exp-number">06</div>
+      <div><div class="exp-name">Onboarding CTA: Goal-Setting vs. Scheduling</div><div class="exp-hypo">Hypothesis: Asking new subscribers to "set a learning goal" in the D1 email will produce higher engagement than "book your first session" because it builds identity commitment before asking for a calendar action.</div><div class="exp-variants"><span class="variant-pill control">A: CTA → Book session</span><span class="variant-pill">B: CTA → Set a goal</span></div></div>
+      <div class="exp-meta-col"><span class="impact-badge impact-med">Med Impact</span><span class="effort-tag">Low effort</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ METRICS ══ -->
+<div id="view-metrics" class="view">
+  <div class="page-header">
+    <div class="page-eyebrow">Reporting Layer</div>
+    <h1 class="page-title">KPI Dashboard</h1>
+    <p class="page-sub">The metrics that matter for a consumer learning subscription — structured by lifecycle stage and tied to business outcomes retention marketing owns.</p>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Monthly Retention Rate</div><div class="stat-value">91.2%</div><div class="stat-delta">↑ +1.4pp MoM</div></div>
+    <div class="stat-card"><div class="stat-label">Avg LTV (12mo)</div><div class="stat-value">$1,847</div><div class="stat-delta">↑ +$214 vs. prior yr</div></div>
+    <div class="stat-card"><div class="stat-label">Winback Rate</div><div class="stat-value">17.3%</div><div class="stat-delta neutral">Target: 20%</div></div>
+    <div class="stat-card"><div class="stat-label">Email Open Rate</div><div class="stat-value">38.1%</div><div class="stat-delta">↑ vs. 22% industry</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px">Activation Metrics</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;color:var(--fg2)">First session booked &lt; 7d</span><span style="font-size:13px;font-weight:700">68%</span></div><div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--accent)"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;color:var(--fg2)">Onboarding email CTR</span><span style="font-size:13px;font-weight:700">16.4%</span></div><div class="bar-track"><div class="bar-fill" style="width:55%;background:var(--accent)"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;color:var(--fg2)">D7 active rate (≥1 session)</span><span style="font-size:13px;font-weight:700">74%</span></div><div class="bar-track"><div class="bar-fill" style="width:74%;background:var(--success)"></div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px">Engagement Metrics</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;color:var(--fg2)">Avg sessions/subscriber/month</span><span style="font-size:13px;font-weight:700">6.2</span></div><div class="bar-track"><div class="bar-fill" style="width:62%;background:var(--accent2)"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;color:var(--fg2)">D30 active rate (≥2 sessions)</span><span style="font-size:13px;font-weight:700">61%</span></div><div class="bar-track"><div class="bar-fill" style="width:61%;background:var(--accent2)"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;color:var(--fg2)">Progress email open rate</span><span style="font-size:13px;font-weight:700">44.8%</span></div><div class="bar-track"><div class="bar-fill" style="width:78%;background:var(--success)"></div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="margin-bottom:16px">30-Day Experiment Results Tracker</div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr style="border-bottom:1px solid var(--border)">
+          <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Experiment</th>
+          <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Metric</th>
+          <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Control</th>
+          <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Variant</th>
+          <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Lift</th>
+          <th style="text-align:center;padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--fg3)">Status</th>
+        </tr></thead>
         <tbody>
-          <tr>
-            <td style="color:var(--fg);font-weight:500">Tutor-sent drift email</td>
-            <td>Re-engagement CTR</td><td>7.2%</td><td>11.8%</td>
-            <td class="lift-pos">+64%</td><td><span class="pill p-win">Winner</span></td>
-          </tr>
-          <tr>
-            <td style="color:var(--fg);font-weight:500">Evening send time</td>
-            <td>Email CTR</td><td>12.1%</td><td>14.3%</td>
-            <td class="lift-pos">+18%</td><td><span class="pill p-win">Winner</span></td>
-          </tr>
-          <tr>
-            <td style="color:var(--fg);font-weight:500">Free month vs. 20% off</td>
-            <td>Resubscription</td><td>13.4%</td><td>12.9%</td>
-            <td class="lift-neg">−4%</td><td><span class="pill p-none">No win</span></td>
-          </tr>
-          <tr>
-            <td style="color:var(--fg);font-weight:500">Progress data density</td>
-            <td>Renewal rate</td><td>88.6%</td><td>—</td>
-            <td class="lift-neu">—</td><td><span class="pill p-run">Running</span></td>
-          </tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">Tutor-sent drift email</td><td style="padding:10px 12px;color:var(--fg2)">Re-engagement CTR</td><td style="padding:10px 12px;text-align:right">7.2%</td><td style="padding:10px 12px;text-align:right">11.8%</td><td style="padding:10px 12px;text-align:right;font-weight:700;color:var(--success)">+64%</td><td style="padding:10px 12px;text-align:center"><span style="background:rgba(34,197,94,.12);color:var(--success);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700">Winner</span></td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">Evening send time</td><td style="padding:10px 12px;color:var(--fg2)">Email CTR</td><td style="padding:10px 12px;text-align:right">12.1%</td><td style="padding:10px 12px;text-align:right">14.3%</td><td style="padding:10px 12px;text-align:right;font-weight:700;color:var(--success)">+18%</td><td style="padding:10px 12px;text-align:center"><span style="background:rgba(34,197,94,.12);color:var(--success);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700">Winner</span></td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">Free month vs. 20% off (winback)</td><td style="padding:10px 12px;color:var(--fg2)">Resubscription rate</td><td style="padding:10px 12px;text-align:right">13.4%</td><td style="padding:10px 12px;text-align:right">12.9%</td><td style="padding:10px 12px;text-align:right;font-weight:700;color:var(--danger)">-4%</td><td style="padding:10px 12px;text-align:center"><span style="background:rgba(239,68,68,.12);color:var(--danger);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700">No win</span></td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">Progress data density</td><td style="padding:10px 12px;color:var(--fg2)">Renewal rate</td><td style="padding:10px 12px;text-align:right">88.6%</td><td style="padding:10px 12px;text-align:right">—</td><td style="padding:10px 12px;text-align:right;color:var(--fg3)">—</td><td style="padding:10px 12px;text-align:center"><span style="background:rgba(245,158,11,.12);color:var(--warn);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700">Running</span></td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">Pause vs. cancel landing page</td><td style="padding:10px 12px;color:var(--fg2)">Hard cancel rate</td><td style="padding:10px 12px;text-align:right">—</td><td style="padding:10px 12px;text-align:right">—</td><td style="padding:10px 12px;text-align:right;color:var(--fg3)">—</td><td style="padding:10px 12px;text-align:center"><span style="background:rgba(91,127,255,.1);color:var(--accent);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700">Backlog</span></td></tr>
+          <tr><td style="padding:10px 12px">Goal-setting vs. session CTA (D1)</td><td style="padding:10px 12px;color:var(--fg2)">D7 activation rate</td><td style="padding:10px 12px;text-align:right">—</td><td style="padding:10px 12px;text-align:right">—</td><td style="padding:10px 12px;text-align:right;color:var(--fg3)">—</td><td style="padding:10px 12px;text-align:center"><span style="background:rgba(91,127,255,.1);color:var(--accent);border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700">Backlog</span></td></tr>
         </tbody>
       </table>
     </div>
-
-    <div class="two-col">
-      <div class="card">
-        <div class="card-title">Testing Protocol</div>
-        <table class="gt">
-          <tbody>
-            <tr><td class="strong" style="width:140px">Significance</td><td>95% confidence minimum before calling winner</td></tr>
-            <tr><td class="strong">Runtime</td><td>14–21 days minimum per test</td></tr>
-            <tr><td class="strong">Concurrency</td><td>One experiment per campaign at a time</td></tr>
-            <tr><td class="strong">Tool</td><td>Braze + A/B Test Analyst Agent</td></tr>
-            <tr><td class="strong">Readout</td><td>Auto-logged to Notion every Monday</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card">
-        <div class="card-title">Prioritization Framework</div>
-        <table class="gt">
-          <tbody>
-            <tr><td class="strong" style="width:140px">Run first</td><td>High impact + low effort (sender identity, send time)</td></tr>
-            <tr><td class="strong">Run second</td><td>High impact + medium effort (data density, pause page)</td></tr>
-            <tr><td class="strong">Defer</td><td>Low impact or high effort tests</td></tr>
-            <tr><td class="strong">Kill</td><td>Anything with &lt;95% significance after 21 days</td></tr>
-          </tbody>
-        </table>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px">Experiment Protocol</div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-day">Week 1</div><div class="tl-title">Hypothesis + success metric defined</div><div class="tl-desc">Primary metric, sample size calc, MDE — documented before launch</div></div>
+        <div class="tl-item"><div class="tl-day">Week 2–3</div><div class="tl-title">Test live · No peeking rule</div><div class="tl-desc">Minimum 2 weeks runtime; wait for 95% confidence before reading</div></div>
+        <div class="tl-item"><div class="tl-day">Week 4</div><div class="tl-title">Read-out + ship or kill decision</div><div class="tl-desc">Winner ships within 5 business days; no-win results documented for next iteration</div></div>
       </div>
     </div>
-
-  </div><!-- /experiments -->
-
-  <!-- ══════════ METRICS ══════════ -->
-  <div class="section" id="metrics">
-
-    <div class="eyebrow">Retention Health</div>
-    <h2>KPI Dashboard</h2>
-    <p class="lead">Core metrics reviewed weekly. Automated Monday digest built with Claude Code + Braze API + Slack.</p>
-
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-lbl">Monthly Retention</div>
-        <div class="kpi-val">91.2%</div>
-        <div class="kpi-delta">↑ 1.4pts MoM</div>
-        <div class="sparkline">
-          <div class="bar" style="height:55%"></div><div class="bar" style="height:62%"></div>
-          <div class="bar" style="height:58%"></div><div class="bar" style="height:70%"></div>
-          <div class="bar" style="height:75%"></div><div class="bar" style="height:80%"></div>
-          <div class="bar hi" style="height:91%"></div>
-        </div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-lbl">12-Month LTV</div>
-        <div class="kpi-val">$1,847</div>
-        <div class="kpi-sub">per subscriber</div>
-        <div class="sparkline">
-          <div class="bar" style="height:60%;background:var(--accent2)"></div><div class="bar" style="height:65%;background:var(--accent2)"></div>
-          <div class="bar" style="height:68%;background:var(--accent2)"></div><div class="bar" style="height:72%;background:var(--accent2)"></div>
-          <div class="bar" style="height:78%;background:var(--accent2)"></div><div class="bar" style="height:82%;background:var(--accent2)"></div>
-          <div class="bar hi" style="height:88%;background:var(--accent2)"></div>
-        </div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-lbl">Winback Rate</div>
-        <div class="kpi-val">17.3%</div>
-        <div class="kpi-warn">target: 20% · gap: 2.7pts</div>
-        <div class="sparkline">
-          <div class="bar" style="height:70%;background:var(--warn)"></div><div class="bar" style="height:75%;background:var(--warn)"></div>
-          <div class="bar" style="height:65%;background:var(--warn)"></div><div class="bar" style="height:72%;background:var(--warn)"></div>
-          <div class="bar" style="height:68%;background:var(--warn)"></div><div class="bar" style="height:80%;background:var(--warn)"></div>
-          <div class="bar hi" style="height:86%;background:var(--warn)"></div>
-        </div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-lbl">Email Open Rate</div>
-        <div class="kpi-val">38.1%</div>
-        <div class="kpi-delta">vs 22% industry benchmark</div>
-        <div class="sparkline">
-          <div class="bar" style="height:55%;background:var(--success)"></div><div class="bar" style="height:62%;background:var(--success)"></div>
-          <div class="bar" style="height:65%;background:var(--success)"></div><div class="bar" style="height:68%;background:var(--success)"></div>
-          <div class="bar" style="height:74%;background:var(--success)"></div><div class="bar" style="height:78%;background:var(--success)"></div>
-          <div class="bar hi" style="height:85%;background:var(--success)"></div>
-        </div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-lbl">D7 Activation Rate</div>
-        <div class="kpi-val">74%</div>
-        <div class="kpi-sub">booked first session within 7 days</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-lbl">Sessions / Subscriber</div>
-        <div class="kpi-val">6.2</div>
-        <div class="kpi-sub">per month · D30 active: 61%</div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px">Automated Reporting Agents</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px"><div style="font-size:13px;font-weight:600;margin-bottom:4px">⚡ Weekly Experiment Digest</div><div style="font-size:12px;color:var(--fg2);line-height:1.5">Automated pull from Braze + Mixpanel every Monday 8am. Summarizes running tests, flags tests at significance, and surfaces top performers for the week.</div></div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px"><div style="font-size:13px;font-weight:600;margin-bottom:4px">📊 Monthly Retention Dashboard</div><div style="font-size:12px;color:var(--fg2);line-height:1.5">Auto-generated on the 1st of each month. Combines renewal rate, LTV, segment cohort trends, and experiment learnings into a single executive summary.</div></div>
       </div>
     </div>
+  </div>
+</div>
 
-    <div class="divider"></div>
+</main>
+</div>
 
-    <div class="eyebrow">Funnel Detail</div>
-    <h2>Activation &amp; Engagement Metrics</h2>
-
-    <div class="two-col">
-      <div class="card">
-        <div class="card-title"><div class="card-dot" style="background:var(--success)"></div>Activation</div>
-        <table class="gt">
-          <tbody>
-            <tr><td class="strong">Signup → session booked D7</td><td>74%</td></tr>
-            <tr><td class="strong">Onboarding email CTR</td><td>16.4%</td></tr>
-            <tr><td class="strong">D7 active (≥1 session)</td><td>74%</td></tr>
-            <tr><td class="strong">D30 active (≥2 sessions)</td><td>61%</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card">
-        <div class="card-title"><div class="card-dot" style="background:var(--accent)"></div>Engagement &amp; Renewal</div>
-        <table class="gt">
-          <tbody>
-            <tr><td class="strong">Progress email open rate</td><td>44.8%</td></tr>
-            <tr><td class="strong">Sessions per subscriber/mo</td><td>6.2</td></tr>
-            <tr><td class="strong">Pre-renewal open rate target</td><td>88–92%</td></tr>
-            <tr><td class="strong">Upsell rate at renewal</td><td>12–18%</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="eyebrow">Reporting Stack</div>
-    <h2>Automated Reporting</h2>
-    <p class="lead">Two agents handle weekly reporting. No manual pulling required.</p>
-
-    <div class="two-col">
-      <div class="card">
-        <div class="card-title"><div class="card-dot" style="background:var(--accent)"></div>Weekly Metrics Digest Agent</div>
-        <table class="gt">
-          <tbody>
-            <tr><td class="strong" style="width:130px">Cadence</td><td>Every Monday 8 AM</td></tr>
-            <tr><td class="strong">Source</td><td>Braze API</td></tr>
-            <tr><td class="strong">Pulls</td><td>Renewal rate · session utilization · at-risk count</td></tr>
-            <tr><td class="strong">Output</td><td>Exec summary → Slack #retention</td></tr>
-            <tr><td class="strong">Stack</td><td>Claude Code · Braze API · Cron</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card">
-        <div class="card-title"><div class="card-dot" style="background:var(--accent2)"></div>A/B Test Analyst Agent</div>
-        <table class="gt">
-          <tbody>
-            <tr><td class="strong" style="width:130px">Cadence</td><td>Auto-reads results weekly</td></tr>
-            <tr><td class="strong">Source</td><td>Braze experiments</td></tr>
-            <tr><td class="strong">Function</td><td>Calls significance · recommends winner</td></tr>
-            <tr><td class="strong">Output</td><td>Findings logged to Notion</td></tr>
-            <tr><td class="strong">Stack</td><td>Python · Claude API · Braze · Notion</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-  </div><!-- /metrics -->
-
-</div><!-- /main -->
+<nav class="bottom-tabs">
+  <div class="bottom-tab-inner">
+    <button class="btab active" onclick="navigate('lifecycle',this)" data-view="lifecycle">Lifecycle</button>
+    <button class="btab" onclick="navigate('segments',this)" data-view="segments">Segments</button>
+    <button class="btab" onclick="navigate('personas',this)" data-view="personas">Personas</button>
+    <button class="btab" onclick="navigate('campaigns',this)" data-view="campaigns">Campaigns</button>
+    <button class="btab" onclick="navigate('experiments',this)" data-view="experiments">Tests</button>
+    <button class="btab" onclick="navigate('metrics',this)" data-view="metrics">KPIs</button>
+  </div>
+</nav>
 
 <script>
-const nav = document.getElementById('nav');
-nav.addEventListener('click', e => {
-  const btn = e.target.closest('button[data-tab]');
-  if (!btn) return;
-  const tab = btn.dataset.tab;
-  nav.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
-  document.querySelectorAll('.section').forEach(s => s.classList.toggle('active', s.id === tab));
+function navigate(viewId, triggerEl) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + viewId).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.view === viewId);
+  });
+  document.querySelectorAll('.btab').forEach(b => {
+    b.classList.toggle('active', b.dataset.view === viewId);
+  });
   window.scrollTo(0, 0);
-  try { localStorage.setItem('np_tab', tab) } catch(_) {}
-});
+  try { localStorage.setItem('np_tab', viewId); } catch(_) {}
+}
+function selectStage(e) {
+  const bars = document.querySelectorAll('.funnel-bar');
+  bars.forEach(b => b.style.opacity = '0.5');
+  e.currentTarget.style.opacity = '1';
+  setTimeout(() => bars.forEach(b => b.style.opacity = '1'), 600);
+}
 try {
   const saved = localStorage.getItem('np_tab');
-  if (saved) {
-    const btn = nav.querySelector(`[data-tab="${saved}"]`);
-    if (btn) btn.click();
+  if (saved && document.getElementById('view-' + saved)) {
+    const btn = document.querySelector('.nav-item[data-view="' + saved + '"]');
+    navigate(saved, btn);
   }
 } catch(_) {}
 </script>
+</body></html>
