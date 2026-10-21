@@ -22,4 +22,4 @@ The playbook is organized into six tabs:
 
 ## About the author
 
-**Chastity Eggleston** has 13 years of experience in EdTech retention marketing. As Director of Customer Marketing at MagicSchool AI, Chastity drove a 97% renewal rate and $10M+ in ARR.
+**Chastity Eggleston** has 13 years of experience in EdTech retention marketing. As Director of Customer Marketing at MagicSchool AI, Chastity drove a 97% renewal rate and contributed to $10M+ in ARR.
